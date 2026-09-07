@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Analyzer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#4d96ff22">📊</div>
+    <h1 class="tool-title" style="color:#4d96ff">Data Analyzer</h1>
+    <p class="tool-desc">Upload CSV or paste data. Get AI-powered insights, trends, and quality reports.</p>
+  </div>
+  <div class="tool-card">
+  <div class="tab-row">
+    <button class="tab active" id="dtu" onclick="dtab('upload')" style="border-color:#4d96ff44;color:#4d96ff">📁 Upload CSV</button>
+    <button class="tab" id="dtp" onclick="dtab('paste')">📝 Paste Data</button>
+  </div>
+  <div id="dtu-sec">
+    <div class="file-drop" id="csvDrop" style="position:relative">
+      <input type="file" id="csvFile" accept=".csv,.txt" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+      <div id="csvLbl"><div style="font-size:28px;margin-bottom:8px">📊</div><div style="font-weight:600;color:#ccc">Drop CSV or click to browse</div><div style="font-size:12px;color:#6bcb77;margin-top:4px">✓ .csv or .txt</div></div>
+    </div>
+  </div>
+  <div id="dtp-sec" style="display:none">
+    <div class="label">Paste data</div>
+    <textarea id="pasteD" style="min-height:160px;font-family:monospace;font-size:12px" placeholder="Name,Age,City&#10;John,25,NYC&#10;Jane,30,LA"></textarea>
+  </div>
+  <div id="dPrevWrap" style="display:none;margin-top:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span class="label" style="margin:0">Preview</span><span id="dStats" style="font-size:12px;color:var(--muted)"></span>
+    </div>
+    <div style="overflow-x:auto;max-height:220px;border:1px solid var(--border);border-radius:10px" id="dPrev"></div>
+  </div>
+  <div class="label" style="margin-top:14px">Analysis type</div>
+  <div class="chips" id="dAChips">
+    <button class="chip active" onclick="setDA('summary',this)">📋 Summary</button>
+    <button class="chip" onclick="setDA('trends',this)">📈 Trends</button>
+    <button class="chip" onclick="setDA('quality',this)">🔍 Quality</button>
+    <button class="chip" onclick="setDA('insights',this)">💡 Insights</button>
+    <button class="chip" onclick="setDA('recommend',this)">🎯 Recommend</button>
+  </div>
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#4d96ff;color:#000;margin-top:14px" onclick="runDA()" disabled>📊 Analyze</button>
+  <div id="daOut-wrap" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="label" style="margin:0">Result</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyText(document.getElementById('daOut').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput('daOut','analysis.txt')">⬇</button>
+      </div>
+    </div>
+    <div class="output-box" id="daOut" style="min-height:160px"></div>
+  </div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let dTab='upload',dAn='summary',dH=[],dR=[];
+function dtab(t){dTab=t;['upload','paste'].forEach(s=>{document.getElementById('dt'+s.charAt(0)+'-sec').style.display=s===t?'block':'none';const b=document.getElementById('dt'+s.charAt(0));b.classList.toggle('active',s===t);b.style.cssText=s===t?'border-color:#4d96ff44;color:#4d96ff':'';});}
+function setDA(t,el){dAn=t;document.querySelectorAll('#dAChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function pCSV(text){const l=text.trim().split('\n').filter(x=>x.trim());if(!l.length)return{h:[],r:[]};const d=text.includes('	')?'	':',';const h=l[0].split(d).map(x=>x.trim().replace(/^["']|["']$/g,''));const r=[];for(let i=1;i<l.length;i++){const c=l[i].split(d).map(x=>x.trim().replace(/^["']|["']$/g,''));const row={};h.forEach((hh,j)=>row[hh]=c[j]||'');r.push(row);}return{h,r};}
+function showPrev(){const w=document.getElementById('dPrevWrap');w.style.display='block';let html='<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr>';dH.forEach(h=>html+=`<th style="background:var(--bg3);padding:6px 10px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap">${escHtml(h)}</th>`);html+='</tr></thead><tbody>';dR.slice(0,20).forEach(r=>{html+='<tr>';dH.forEach(h=>html+=`<td style="padding:6px 10px;border-bottom:1px solid var(--border2);color:#b8b8cc;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis">${escHtml(r[h]||'')}</td>`);html+='</tr>';});html+='</tbody></table>';if(dR.length>20)html+=`<div style="padding:8px;text-align:center;font-size:11px;color:var(--muted)">+${dR.length-20} more rows</div>`;document.getElementById('dPrev').innerHTML=html;document.getElementById('dStats').textContent=`${dR.length} rows · ${dH.length} cols`;}
+document.getElementById('csvFile').addEventListener('change',function(){if(this.files[0])loadCSV(this.files[0]);});
+const cdz=document.getElementById('csvDrop');cdz.addEventListener('dragover',e=>{e.preventDefault();cdz.classList.add('dragover');});cdz.addEventListener('dragleave',()=>cdz.classList.remove('dragover'));cdz.addEventListener('drop',e=>{e.preventDefault();cdz.classList.remove('dragover');if(e.dataTransfer.files[0])loadCSV(e.dataTransfer.files[0]);});
+function loadCSV(file){const r=new FileReader();r.onload=e=>{const p=pCSV(e.target.result);dH=p.h;dR=p.r;showPrev();document.getElementById('csvLbl').innerHTML=`<div style="font-size:24px;margin-bottom:6px">✅</div><div style="color:#6bcb77;font-weight:600">${file.name}</div><div style="font-size:12px;color:#888">${dR.length} rows · ${dH.length} cols</div>`;cdz.classList.add('has-file');document.getElementById('runBtn').disabled=false;showToast('✓ CSV loaded','ok');};r.readAsText(file);}
+const sys={summary:'Analyze: 1)Overview(rows,cols,types) 2)Stats for numeric cols 3)Top categories 4)Patterns. Be concise.',trends:'Trends: 1)Time/category trends 2)Correlations 3)Growth/decline.',quality:'Quality: 1)Missing values per col 2)Duplicates 3)Outliers 4)Inconsistencies 5)Fix recommendations.',insights:'Insights: 1)Surprising findings 2)Hidden patterns 3)Anomalies 4)Story the data tells.',recommend:'Recommend: 1)5 specific actions 2)Additional data needed 3)Risks/opportunities.'};
+async function runDA(){
+  let text='';
+  if(dTab==='upload'){if(!dR.length){showToast('⚠ Upload a CSV first','warn');return;}text=dH.join(',')+'\n'+dR.map(r=>dH.map(h=>r[h]).join(',')).join('\n');}
+  else{text=document.getElementById('pasteD').value.trim();if(!text){showToast('⚠ Paste some data','warn');return;}const p=pCSV(text);dH=p.h;dR=p.r;showPrev();}
+  const btn=document.getElementById('runBtn');startTimer();showSkeleton(document.getElementById('daOut'));setLoading(btn,true,'📊 Analyze',true);
+  const d=text.length>15000?text.slice(0,15000)+'\n...(truncated)':text;
+  try{const res=await callClaude(sys[dAn],'Dataset:\n'+d);showOutput(document.getElementById('daOut'),res);document.getElementById('daOut-wrap').style.display='block';
+    document.getElementById('daOut-wrap').scrollIntoView({behavior:'smooth'});showToast('Done in '+getElapsed(),'ok');}
+  catch(e){showOutput(document.getElementById('daOut'),'Error: '+e.message,true);document.getElementById('daOut-wrap').style.display='block';}
+  setLoading(btn,false,'📊 Analyze');
+}
+</script>
+</body></html>

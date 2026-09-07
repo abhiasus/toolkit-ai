@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Image Generator — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ff6b6b22">🎨</div>
+    <h1 class="tool-title" style="color:#ff6b6b">AI Image Generator</h1>
+    <p class="tool-desc">Create images from text prompts. Powered by Pollinations AI — completely free, no API key needed.</p>
+  </div>
+  <div class="tool-card">
+  <div class="label">Your prompt</div>
+  <textarea id="imgPrompt" style="min-height:90px" placeholder="A futuristic city at night with neon lights, cyberpunk style, 8k..."></textarea>
+  <div class="label">Style</div>
+  <div class="chips" id="sChips">
+    <button class="chip active" onclick="setSt(this,'')">✨ Default</button>
+    <button class="chip" onclick="setSt(this,', photorealistic, 8k')">📷 Photo</button>
+    <button class="chip" onclick="setSt(this,', anime style')">🎌 Anime</button>
+    <button class="chip" onclick="setSt(this,', digital art')">🖼 Digital</button>
+    <button class="chip" onclick="setSt(this,', oil painting')">🎨 Oil</button>
+    <button class="chip" onclick="setSt(this,', watercolor')">💧 Water</button>
+    <button class="chip" onclick="setSt(this,', 3d render')">🧊 3D</button>
+    <button class="chip" onclick="setSt(this,', pencil sketch')">✏️ Sketch</button>
+  </div>
+  <div class="row row-2" style="margin-top:12px">
+    <div><div class="label">Size</div>
+      <div class="chips" id="szChips">
+        <button class="chip" onclick="setSz(this,256,256)">256</button>
+        <button class="chip active" onclick="setSz(this,512,512)">512</button>
+        <button class="chip" onclick="setSz(this,768,768)">768</button>
+        <button class="chip" onclick="setSz(this,1024,1024)">1024</button>
+      </div>
+    </div>
+    <div><div class="label">Count</div>
+      <div class="chips" id="ctChips">
+        <button class="chip active" onclick="setCt(1,this)">1</button>
+        <button class="chip" onclick="setCt(2,this)">2</button>
+        <button class="chip" onclick="setCt(4,this)">4</button>
+      </div>
+    </div>
+  </div>
+  <div class="label">Negative prompt (optional)</div>
+  <input type="text" id="negP" placeholder="blur, ugly, low quality...">
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#ff6b6b;color:#000;margin-top:14px" onclick="genImg()">🎨 Generate</button>
+</div>
+<div id="imgPH" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;background:var(--bg2);border:2px dashed var(--border2);border-radius:14px;color:var(--muted);margin-top:4px;text-align:center">
+  <div style="font-size:38px;margin-bottom:8px">🎨</div>
+  <div style="font-size:13px">Images appear here</div>
+  <div style="font-size:11px;color:var(--muted2);margin-top:3px">No API key needed — 100% free</div>
+</div>
+<div id="imgGrid" style="display:none;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:8px"></div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let iSuf='',iW=512,iH=512,iCt=1;
+function setSt(el,s){iSuf=s;document.querySelectorAll('#sChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function setSz(el,w,h){iW=w;iH=h;document.querySelectorAll('#szChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function setCt(n,el){iCt=n;document.querySelectorAll('#ctChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+async function genImg(){
+  const p=document.getElementById('imgPrompt').value.trim();
+  if(!p){showToast('⚠ Enter a prompt','warn');return;}
+  const neg=document.getElementById('negP').value.trim();
+  const btn=document.getElementById('runBtn');
+  setLoading(btn,true,'🎨 Generate',true);
+  const full=p+iSuf, seed=Math.floor(Math.random()*999999);
+  document.getElementById('imgPH').style.display='none';
+  const grid=document.getElementById('imgGrid');
+  grid.style.display='grid';grid.innerHTML='';
+  for(let i=0;i<iCt;i++){
+    const id='gi'+Date.now()+i;
+    const card=document.createElement('div');
+    card.style.cssText='background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden';
+    card.innerHTML=`<div id="${id}" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:var(--bg)"><span class="loading-dots"><span></span><span></span><span></span></span></div><div style="padding:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(p.slice(0,60))}</div><button onclick="dlImg('${id}')" style="width:100%;padding:7px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">⬇ Download</button></div>`;
+    grid.appendChild(card);
+    const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?width=${iW}&height=${iH}&seed=${seed+i}&nologo=true${neg?'&negative='+encodeURIComponent(neg):''}`;
+    const img=new Image();img.dataset.url=url;
+    img.onload=function(){const c=document.getElementById(id);c.innerHTML='';c.appendChild(img);img.style.cssText='width:100%;display:block';};
+    img.onerror=function(){document.getElementById(id).innerHTML='<div style="color:#ff9090;font-size:12px;padding:14px;text-align:center">⚠ Failed — try different prompt</div>';};
+    img.src=url;
+  }
+  setLoading(btn,false,'🎨 Generate');
+  showToast('Generating '+iCt+' image(s)... ~10s','ok');
+}
+function dlImg(id){const img=document.querySelector('#'+id+' img');if(!img){showToast('Still loading...','warn');return;}const a=document.createElement('a');a.href=img.dataset.url;a.download='toolkit-ai-'+Date.now()+'.png';a.target='_blank';a.click();}
+</script>
+</body></html>

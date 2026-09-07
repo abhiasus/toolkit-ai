@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>File Converter — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+.fmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.fmt-card{padding:12px 8px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;transition:all .18s;text-align:center}
+.fmt-card:hover{border-color:var(--border3)}
+.fmt-card.active{border-color:#06d6a0;background:#0a1f15}
+.fmt-card.active .fmt-name{color:#06d6a0}
+.fmt-icon{font-size:22px;margin-bottom:4px}
+.fmt-name{font-size:12px;font-weight:600;color:#ddd}
+.fmt-desc{font-size:10px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#06d6a022">🔄</div>
+    <h1 class="tool-title" style="color:#06d6a0">File Converter</h1>
+    <p class="tool-desc">PDF, Word, Images, or Text → any format. 100% local, nothing uploaded anywhere.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Input type</div>
+    <div class="tab-row" style="margin-bottom:14px">
+      <button class="tab active" id="itab-pdf" onclick="switchIn('pdf')" style="border-color:#06d6a044;color:#06d6a0">📄 PDF</button>
+      <button class="tab" id="itab-word" onclick="switchIn('word')">📝 Word (.docx)</button>
+      <button class="tab" id="itab-image" onclick="switchIn('image')">🖼 Image (JPG/PNG)</button>
+      <button class="tab" id="itab-text" onclick="switchIn('text')">📃 Plain Text</button>
+    </div>
+    <div id="in-pdf">
+      <div class="file-drop" id="pdfDrop" style="position:relative">
+        <input type="file" id="pdfFile" accept=".pdf" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+        <div id="pdfLbl"><div style="font-size:32px;margin-bottom:8px">📄</div><div style="font-weight:600;color:#ccc">Drop PDF here or click to browse</div><div style="font-size:12px;color:#6bcb77;margin-top:5px">✓ Up to 50MB · 100% in your browser</div></div>
+      </div>
+      <div id="pdfProg" style="display:none;margin-top:10px"><div class="progress-bar"><div class="progress-fill" id="pdfFill" style="background:#06d6a0"></div></div><div class="progress-label" id="pdfLblP"></div></div>
+      <div id="rangeRow" style="display:none;margin-top:10px"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:12px;color:var(--muted)">Page range:</span><input type="text" id="pageRange" placeholder="e.g. 1-5 or 1,3,7 (blank = all)" style="width:200px;padding:6px 10px;font-size:12px"></div></div>
+    </div>
+    <div id="in-word" style="display:none">
+      <div class="file-drop" id="wordDrop" style="position:relative">
+        <input type="file" id="wordFile" accept=".docx,.doc" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+        <div id="wordLbl"><div style="font-size:32px;margin-bottom:8px">📝</div><div style="font-weight:600;color:#ccc">Drop Word (.docx) here or click</div><div style="font-size:12px;color:#6bcb77;margin-top:5px">✓ Converts to PDF, Text, Markdown, HTML</div></div>
+      </div>
+      <div id="wordProg" style="display:none;margin-top:10px"><div class="progress-bar"><div class="progress-fill" id="wordFill" style="background:#06d6a0"></div></div><div class="progress-label" id="wordLblP"></div></div>
+    </div>
+    <div id="in-image" style="display:none">
+      <div class="file-drop" id="imgDrop" style="position:relative">
+        <input type="file" id="imgFile" accept=".jpg,.jpeg,.png,.webp,.bmp" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+        <div id="imgLbl"><div style="font-size:32px;margin-bottom:8px">🖼</div><div style="font-weight:600;color:#ccc">Drop images here or click</div><div style="font-size:12px;color:#6bcb77;margin-top:5px">✓ JPG, PNG, WebP · Multiple → single PDF</div></div>
+      </div>
+    </div>
+    <div id="in-text" style="display:none">
+      <div class="label">Paste your text</div>
+      <textarea id="textIn" style="min-height:160px;font-size:13px" placeholder="Paste text here — converts to PDF, Markdown, HTML..."></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px" id="wCount">0 words</div>
+    </div>
+    <div class="label" style="margin-top:18px">Output format</div>
+    <div class="fmt-grid" id="fmtGrid">
+      <div class="fmt-card pdf-out active" data-fmt="txt" onclick="setFmt('txt',this)"><div class="fmt-icon">📃</div><div class="fmt-name">Plain Text</div><div class="fmt-desc">Clean .txt</div></div>
+      <div class="fmt-card pdf-out" data-fmt="docx" onclick="setFmt('docx',this)"><div class="fmt-icon">📝</div><div class="fmt-name">Word (.docx)</div><div class="fmt-desc">Editable doc</div></div>
+      <div class="fmt-card pdf-out" data-fmt="md" onclick="setFmt('md',this)"><div class="fmt-icon">✏️</div><div class="fmt-name">Markdown</div><div class="fmt-desc">.md file</div></div>
+      <div class="fmt-card pdf-out" data-fmt="html" onclick="setFmt('html',this)"><div class="fmt-icon">🌐</div><div class="fmt-name">HTML</div><div class="fmt-desc">Web page</div></div>
+      <div class="fmt-card pdf-out" data-fmt="csv" onclick="setFmt('csv',this)"><div class="fmt-icon">📊</div><div class="fmt-name">CSV</div><div class="fmt-desc">Spreadsheet</div></div>
+      <div class="fmt-card pdf-out" data-fmt="json" onclick="setFmt('json',this)"><div class="fmt-icon">{}</div><div class="fmt-name">JSON</div><div class="fmt-desc">Structured</div></div>
+      <div class="fmt-card pdf-out" data-fmt="jpg" onclick="setFmt('jpg',this)"><div class="fmt-icon">🖼</div><div class="fmt-name">JPG Images</div><div class="fmt-desc">Each page</div></div>
+      <div class="fmt-card pdf-out" data-fmt="png" onclick="setFmt('png',this)"><div class="fmt-icon">🏔</div><div class="fmt-name">PNG Images</div><div class="fmt-desc">Each page</div></div>
+      <div class="fmt-card to-pdf" data-fmt="pdf" onclick="setFmt('pdf',this)" style="display:none"><div class="fmt-icon">📄</div><div class="fmt-name">PDF</div><div class="fmt-desc">Export as PDF</div></div>
+    </div>
+    <button class="btn btn-full btn-run-primary" id="convertBtn" style="background:#06d6a0;color:#000;margin-top:14px;font-size:15px" onclick="runConvert()" disabled>🔄 Convert File</button>
+    <div id="convProg" style="display:none;margin-top:10px"><div class="progress-bar"><div class="progress-fill" id="convFill" style="background:#06d6a0"></div></div><div class="progress-label" id="convLbl"></div></div>
+  </div>
+  <div id="resultSec" style="display:none" class="tool-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span class="label" style="margin:0">Output</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyResult()">Copy</button>
+        <button class="dl-btn" id="dlBtn" onclick="dlResult()">⬇ Download</button>
+      </div>
+    </div>
+    <div class="output-box" id="resultBox" style="min-height:180px;max-height:500px;overflow-y:auto;font-family:monospace;font-size:12px;white-space:pre-wrap"></div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let inType='pdf',curFmt='txt',pdfDoc=null,pages=[],extractedText='',wordText='',imgFiles=[],resultData=null;
+
+function switchIn(t){
+  inType=t;
+  ['pdf','word','image','text'].forEach(s=>{
+    document.getElementById('in-'+s).style.display=s===t?'block':'none';
+    const b=document.getElementById('itab-'+s);
+    b.classList.toggle('active',s===t);
+    b.style.cssText=s===t?'border-color:#06d6a044;color:#06d6a0':'';
+  });
+  if(t==='pdf'){
+    document.querySelectorAll('.fmt-card.pdf-out').forEach(c=>c.style.display='');
+    document.querySelectorAll('.fmt-card.to-pdf').forEach(c=>c.style.display='none');
+    if(curFmt==='pdf')setFmt('txt',document.querySelector('[data-fmt="txt"]'));
+  }else{
+    document.querySelectorAll('.fmt-card.pdf-out').forEach(c=>{c.style.display=(c.dataset.fmt==='jpg'||c.dataset.fmt==='png')?'none':''});
+    document.querySelectorAll('.fmt-card.to-pdf').forEach(c=>c.style.display='');
+    setFmt('pdf',document.querySelector('[data-fmt="pdf"]'));
+  }
+  pdfDoc=null;pages=[];extractedText='';wordText='';imgFiles=[];
+  document.getElementById('convertBtn').disabled=true;
+  document.getElementById('resultSec').style.display='none';
+  document.getElementById('convProg').style.display='none';
+  document.getElementById('rangeRow').style.display='none';
+  document.getElementById('pdfProg').style.display='none';
+}
+
+function setFmt(f,el){curFmt=f;document.querySelectorAll('.fmt-card').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');}
+
+// PDF
+document.getElementById('pdfFile').addEventListener('change',function(){if(this.files[0])loadPDF(this.files[0]);});
+setupDrop('pdfDrop',f=>loadPDF(f));
+async function loadPDF(file){
+  if(file.size>52428800){showToast('⚠ Max 50MB','warn');return;}
+  const mb=(file.size/1048576).toFixed(1);
+  document.getElementById('pdfLbl').innerHTML=`<div style="font-size:24px;margin-bottom:6px">⏳</div><div style="color:#aaa">Loading ${file.name}...</div>`;
+  const prog=document.getElementById('pdfProg'),fill=document.getElementById('pdfFill'),lbl=document.getElementById('pdfLblP');
+  prog.style.display='block';fill.style.width='10%';lbl.textContent='Reading PDF...';
+  try{
+    const ab=await file.arrayBuffer();
+    pdfDoc=await pdfjsLib.getDocument({data:new Uint8Array(ab)}).promise;
+    pages=[];extractedText='';
+    for(let i=1;i<=pdfDoc.numPages;i++){
+      fill.style.width=Math.round(i/pdfDoc.numPages*90)+'%';
+      lbl.textContent=`Extracting page ${i} of ${pdfDoc.numPages}...`;
+      const page=await pdfDoc.getPage(i);
+      const content=await page.getTextContent();
+      const text=content.items.map(it=>it.str).join(' ').trim();
+      pages.push({num:i,text});
+      extractedText+=(i>1?'\n\n':'')+text;
+    }
+    fill.style.width='100%';fill.style.background='#6bcb77';
+    const words=extractedText.split(/\s+/).filter(Boolean).length;
+    lbl.textContent=`✓ ${pdfDoc.numPages} pages · ${words.toLocaleString()} words extracted`;
+    document.getElementById('pdfLbl').innerHTML=`<div style="font-size:24px;margin-bottom:6px">✅</div><div style="color:#6bcb77;font-weight:600">${file.name}</div><div style="font-size:12px;color:#888">${mb}MB · ${pdfDoc.numPages} pages · click to change</div>`;
+    document.getElementById('pdfDrop').classList.add('has-file');
+    document.getElementById('rangeRow').style.display='block';
+    document.getElementById('convertBtn').disabled=false;
+    showToast('✓ PDF loaded — '+pdfDoc.numPages+' pages','ok');
+  }catch(e){lbl.textContent='⚠ '+e.message;fill.style.background='#ff6b6b';showToast('✗ '+e.message,'err');}
+}
+
+// WORD
+document.getElementById('wordFile').addEventListener('change',function(){if(this.files[0])loadWord(this.files[0]);});
+setupDrop('wordDrop',f=>loadWord(f));
+async function loadWord(file){
+  const prog=document.getElementById('wordProg'),fill=document.getElementById('wordFill'),lbl=document.getElementById('wordLblP');
+  prog.style.display='block';fill.style.width='40%';lbl.textContent='Reading Word document...';
+  try{
+    const ab=await file.arrayBuffer();
+    const result=await mammoth.extractRawText({arrayBuffer:ab});
+    wordText=result.value;extractedText=wordText;pages=[{num:1,text:wordText}];
+    fill.style.width='100%';fill.style.background='#6bcb77';
+    const words=wordText.split(/\s+/).filter(Boolean).length;
+    lbl.textContent=`✓ ${words.toLocaleString()} words extracted`;
+    document.getElementById('wordLbl').innerHTML=`<div style="font-size:24px;margin-bottom:6px">✅</div><div style="color:#6bcb77;font-weight:600">${file.name}</div><div style="font-size:12px;color:#888">${words.toLocaleString()} words · click to change</div>`;
+    document.getElementById('wordDrop').classList.add('has-file');
+    document.getElementById('convertBtn').disabled=false;
+    showToast('✓ Word file loaded','ok');
+  }catch(e){lbl.textContent='⚠ '+e.message;fill.style.background='#ff6b6b';showToast('✗ '+e.message,'err');}
+}
+
+// IMAGES
+document.getElementById('imgFile').addEventListener('change',function(){if(this.files.length)loadImgs(this.files);});
+setupDrop('imgDrop',f=>loadImgs([f]),true);
+function loadImgs(files){
+  imgFiles=Array.from(files);
+  document.getElementById('imgLbl').innerHTML=`<div style="font-size:24px;margin-bottom:6px">✅</div><div style="color:#6bcb77;font-weight:600">${imgFiles.length} image(s) selected</div><div style="font-size:12px;color:#888">${imgFiles.map(f=>f.name).join(', ').slice(0,80)}</div>`;
+  document.getElementById('imgDrop').classList.add('has-file');
+  document.getElementById('convertBtn').disabled=false;
+  showToast('✓ '+imgFiles.length+' image(s) ready','ok');
+}
+
+// TEXT
+document.getElementById('textIn').addEventListener('input',function(){
+  const w=this.value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wCount').textContent=w.toLocaleString()+' words';
+  document.getElementById('convertBtn').disabled=!this.value.trim();
+});
+
+function setupDrop(id,cb,multi=false){
+  const el=document.getElementById(id);
+  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dragover');});
+  el.addEventListener('dragleave',()=>el.classList.remove('dragover'));
+  el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('dragover');const f=multi?e.dataTransfer.files:e.dataTransfer.files[0];if(f)cb(f);});
+}
+
+function parseRange(str,max){
+  if(!str||!str.trim())return Array.from({length:max},(_,i)=>i+1);
+  const s=new Set();str.split(',').forEach(p=>{const t=p.trim();if(t.includes('-')){const[a,b]=t.split('-').map(Number);for(let i=Math.max(1,a);i<=Math.min(max,b);i++)s.add(i);}else{const n=parseInt(t);if(n>=1&&n<=max)s.add(n);}});return[...s].sort((a,b)=>a-b);
+}
+
+function buildTXT(pg){return pg.map(p=>`[Page ${p.num}]
+${p.text}`).join('\n\n');}
+function buildMD(pg){return pg.map(p=>`## Page ${p.num}
+
+${p.text}`).join('\n\n---\n\n');}
+function buildHTML(pg){return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Converted</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.7}h2{border-bottom:1px solid #ddd;padding-bottom:6px}</style></head><body>
+${pg.map(p=>`<h2>Page ${p.num}</h2><p>${p.text.replace(/
+/g,'<br>')}</p>`).join('\n')}\n</body></html>`;}\nfunction buildCSV(pg){return'Page,Content\n'+pg.map(p=>`${p.num},"${p.text.replace(/"/g,'""')}"`).join('
+');}
+function buildJSON(pg){return JSON.stringify(pg.map(p=>{return{page:p.num,content:p.text}}).filter(Boolean),null,2);}
+
+async function textToPDF(text){
+  const{jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  pdf.setFontSize(11);
+  const lines=pdf.splitTextToSize(text,180);
+  let y=20;
+  for(const line of lines){if(y>280){pdf.addPage();y=20;}pdf.text(line,15,y);y+=6;}
+  return pdf.output('blob');
+}
+
+async function imgsToPDF(){
+  const{jsPDF}=window.jspdf;let pdf=null;
+  for(const file of imgFiles){
+    const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+    const img=await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=dataUrl;});
+    const orient=img.width>img.height?'landscape':'portrait';
+    const fmt=file.type==='image/png'?'PNG':'JPEG';
+    if(!pdf){pdf=new jsPDF({orientation:orient,unit:'px',format:[img.width,img.height]});}
+    else{pdf.addPage([img.width,img.height],orient);}
+    pdf.addImage(dataUrl,fmt,0,0,img.width,img.height);
+  }
+  return pdf.output('blob');
+}
+
+async function renderPageToImg(pageNum,type){
+  const page=await pdfDoc.getPage(pageNum);
+  const viewport=page.getViewport({scale:2});
+  const canvas=document.createElement('canvas');
+  canvas.width=viewport.width;canvas.height=viewport.height;
+  await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+  return new Promise(res=>canvas.toBlob(res,type==='jpg'?'image/jpeg':'image/png',0.92));
+}
+
+async function runConvert(){
+  const btn=document.getElementById('convertBtn');
+  const prog=document.getElementById('convProg'),fill=document.getElementById('convFill'),lbl=document.getElementById('convLbl');
+  setLoading(btn,true,'🔄 Convert File',true);startTimer();
+  prog.style.display='block';fill.style.width='10%';fill.style.background='#06d6a0';lbl.textContent='Converting...';
+
+  try{
+    // TEXT input
+    if(inType==='text'){
+      const text=document.getElementById('textIn').value.trim();
+      if(!text){showToast('⚠ Paste some text first','warn');setLoading(btn,false,'🔄 Convert File');return;}
+      extractedText=text;pages=[{num:1,text}];
+      if(curFmt==='pdf'){
+        lbl.textContent='Building PDF...';
+        const blob=await textToPDF(text);
+        fill.style.width='100%';lbl.textContent='✓ Done!';
+        dlBlob(blob,'converted.pdf');
+        showMsg('✓ PDF created and downloaded! Check your Downloads folder.',true);
+      }else{
+        showMsg(buildFor(pages),false,'converted.'+curFmt);
+      }
+    }
+    // WORD input
+    else if(inType==='word'){
+      if(!extractedText){showToast('⚠ Upload a Word file first','warn');setLoading(btn,false,'🔄 Convert File');return;}
+      if(curFmt==='pdf'){
+        lbl.textContent='Building PDF...';
+        const blob=await textToPDF(extractedText);
+        fill.style.width='100%';lbl.textContent='✓ Done!';
+        dlBlob(blob,'converted.pdf');
+        showMsg('✓ PDF created and downloaded! Check your Downloads folder.',true);
+      }else{
+        showMsg(buildFor(pages),false,'converted.'+curFmt);
+      }
+    }
+    // IMAGE input
+    else if(inType==='image'){
+      if(!imgFiles.length){showToast('⚠ Select images first','warn');setLoading(btn,false,'🔄 Convert File');return;}
+      lbl.textContent='Merging '+imgFiles.length+' images into PDF...';
+      const blob=await imgsToPDF();
+      fill.style.width='100%';lbl.textContent='✓ Done!';
+      dlBlob(blob,'images-to-pdf.pdf');
+      showMsg('✓ '+imgFiles.length+' image(s) merged into PDF and downloaded!',true);
+    }
+    // PDF input
+    else{
+      if(!pdfDoc){showToast('⚠ Upload a PDF first','warn');setLoading(btn,false,'🔄 Convert File');return;}
+      const rangeStr=document.getElementById('pageRange').value;
+      const sel=parseRange(rangeStr,pdfDoc.numPages);
+      const selPages=pages.filter(p=>sel.includes(p.num));
+      if(curFmt==='jpg'||curFmt==='png'){
+        lbl.textContent=`Converting ${sel.length} pages to images...`;
+        const blobs=[];
+        for(let i=0;i<sel.length;i++){
+          fill.style.width=Math.round((i+1)/sel.length*90)+'%';
+          lbl.textContent=`Rendering page ${i+1} of ${sel.length}...`;
+          const blob=await renderPageToImg(sel[i],curFmt);
+          blobs.push({blob,name:`page-${sel[i]}.${curFmt}`});
+        }
+        fill.style.width='100%';lbl.textContent='✓ Downloading images...';
+        for(const b of blobs)dlBlob(b.blob,b.name);
+        showMsg('✓ '+blobs.length+' pages converted to '+curFmt.toUpperCase()+' and downloaded!',true);
+      }else{
+        const content=buildFor(selPages);
+        showMsg(content,false,'converted.'+curFmt);
+      }
+    }
+
+    fill.style.width='100%';fill.style.background='#6bcb77';
+    showToast('✓ Converted in '+getElapsed(),'ok');
+  }catch(e){
+    lbl.textContent='✗ '+e.message;fill.style.background='#ff6b6b';showToast('✗ '+e.message,'err');console.error(e);
+  }
+  setLoading(btn,false,'🔄 Convert File');
+}
+
+function buildFor(pg){
+  if(curFmt==='txt')return buildTXT(pg);
+  if(curFmt==='md')return buildMD(pg);
+  if(curFmt==='html')return buildHTML(pg);
+  if(curFmt==='csv')return buildCSV(pg);
+  if(curFmt==='json')return buildJSON(pg);
+  return buildTXT(pg);
+}
+
+let _resultContent='',_resultIsDownloaded=false;
+function showMsg(content,downloaded,fname){
+  _resultContent=content;_resultIsDownloaded=downloaded;
+  const sec=document.getElementById('resultSec');sec.style.display='block';
+  const box=document.getElementById('resultBox');
+  if(downloaded){
+    box.style.fontFamily='inherit';
+    box.innerHTML=`<div style="color:#6bcb77;padding:14px;font-size:14px">✅ ${escHtml(content)}<br><br><span style="color:var(--muted);font-size:12px">Check your Downloads folder.</span></div>`;
+    document.getElementById('dlBtn').style.display='none';
+  }else{
+    box.style.fontFamily='monospace';box.textContent=content;
+    document.getElementById('dlBtn').style.display='inline-block';
+    _dlName=fname;
+  }
+  sec.scrollIntoView({behavior:'smooth'});
+}
+let _dlName='converted.txt';
+function copyResult(){navigator.clipboard.writeText(document.getElementById('resultBox').innerText).then(()=>showToast('✓ Copied!','ok'));}
+function dlResult(){
+  const mime=curFmt==='html'?'text/html':curFmt==='json'?'application/json':curFmt==='csv'?'text/csv':'text/plain';
+  dlBlob(new Blob([_resultContent],{type:mime}),_dlName);showToast('✓ Downloaded!','ok');
+}
+function dlBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+</script>
+</body></html>

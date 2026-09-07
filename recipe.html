@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipe Generator — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ff9a3c22">🍳</div>
+    <h1 class="tool-title" style="color:#ff9a3c">Recipe Generator</h1>
+    <p class="tool-desc">Tell us what ingredients you have or want to cook. Get complete recipes with steps and tips.</p>
+  </div>
+  <div class="tool-card">
+  <div class="label">Ingredients / what you want to make</div>
+  <textarea id="ingr" style="min-height:90px" placeholder="I have chicken, rice, bell peppers, garlic...&#10;Or: I want to make chocolate lava cake"></textarea>
+  <div class="label">Dietary</div>
+  <div class="chips" id="dChips">
+    <button class="chip active" onclick="setD(this,'None')">None</button><button class="chip" onclick="setD(this,'Vegetarian')">Vegetarian</button><button class="chip" onclick="setD(this,'Vegan')">Vegan</button><button class="chip" onclick="setD(this,'Keto')">Keto</button><button class="chip" onclick="setD(this,'Gluten-Free')">Gluten-Free</button><button class="chip" onclick="setD(this,'High-Protein')">High-Protein</button>
+  </div>
+  <div class="row row-3" style="margin-top:12px">
+    <div><div class="label">Meal</div><select id="meal"><option>Any</option><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option><option>Dessert</option></select></div>
+    <div><div class="label">Cuisine</div><select id="cuis"><option>Any</option><option>Indian</option><option>Italian</option><option>Mexican</option><option>Chinese</option><option>Japanese</option><option>American</option></select></div>
+    <div><div class="label">Servings</div><select id="serv"><option>1</option><option selected>2</option><option>4</option><option>6</option><option>8</option></select></div>
+  </div>
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#ff9a3c;color:#000;margin-top:14px" onclick="genRecipe()">🍳 Generate Recipe</button>
+  <div id="recipeOut-wrap" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="label" style="margin:0">Result</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyText(document.getElementById('recipeOut').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput('recipeOut','recipe.txt')">⬇</button>
+      </div>
+    </div>
+    <div class="output-box" id="recipeOut" style="min-height:160px"></div>
+  </div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let rDiet='None';
+function setD(el,d){rDiet=d;document.querySelectorAll('#dChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+async function genRecipe(){
+  const ing=document.getElementById('ingr').value.trim();
+  if(!ing){showToast('⚠ Enter ingredients or what to make','warn');return;}
+  const btn=document.getElementById('runBtn');startTimer();showSkeleton(document.getElementById('recipeOut'));setLoading(btn,true,'🍳 Generate Recipe',true);
+  try{
+    const res=await callClaude('Professional chef. Complete recipe with: name, prep/cook/total time, servings, ingredients with measurements, numbered steps, chef tips, calories per serving.',
+      'Ingredients: '+ing+'\nMeal: '+document.getElementById('meal').value+'\nCuisine: '+document.getElementById('cuis').value+'\nDietary: '+rDiet+'\nServings: '+document.getElementById('serv').value);
+    showOutput(document.getElementById('recipeOut'),res);document.getElementById('recipeOut-wrap').style.display='block';
+    document.getElementById('recipeOut-wrap').scrollIntoView({behavior:'smooth'});showToast('Recipe ready in '+getElapsed(),'ok');}
+  catch(e){showOutput(document.getElementById('recipeOut'),'Error: '+e.message,true);document.getElementById('recipeOut-wrap').style.display='block';}
+  setLoading(btn,false,'🍳 Generate Recipe');
+}
+</script>
+</body></html>

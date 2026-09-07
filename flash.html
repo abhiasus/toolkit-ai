@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flashcard Maker — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:24px}
+.flashcard{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:20px;cursor:pointer;min-height:140px;display:flex;flex-direction:column;justify-content:space-between;transition:all .22s;user-select:none}
+.flashcard:hover{transform:translateY(-2px);border-color:#333;background:#161626}
+.flashcard.flipped{background:#0a0a20;border-color:#4d96ff44}
+.card-front-content{display:block}.card-back-content{display:none}
+.flashcard.flipped .card-front-content{display:none}
+.flashcard.flipped .card-back-content{display:block;color:#8888bb;font-size:13px;line-height:1.55}
+.card-num{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.card-q{font-size:14px;font-weight:500;line-height:1.5}
+.card-hint{font-size:11px;color:var(--muted2);margin-top:10px}
+.deck-controls{display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:gap}
+.deck-stat{font-size:13px;color:var(--muted)}
+</style>
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#4d96ff22">🃏</div>
+    <h1 class="tool-title" style="color:#4d96ff">Flashcard Maker</h1>
+    <p class="tool-desc">Paste any notes, chapter, or text. Get interactive flashcards — tap any card to flip and reveal the answer.</p>
+  </div>
+
+  <div class="tool-card">
+    <div class="label">Number of cards</div>
+    <div class="chips">
+      <button class="chip" onclick="setCount(5,this)">5 cards</button>
+      <button class="chip active" onclick="setCount(8,this)">8 cards</button>
+      <button class="chip" onclick="setCount(12,this)">12 cards</button>
+      <button class="chip" onclick="setCount(16,this)">16 cards</button>
+    </div>
+
+    <div class="label">Study material</div>
+    <textarea id="studyText" style="min-height:180px" placeholder="Paste your notes, textbook chapter, lecture slides, or any content you want to study..."></textarea>
+
+    <button class="btn btn-full" id="runBtn" style="background:#4d96ff;color:#000;margin-top:16px" onclick="generateCards()">
+      🃏 Generate Flashcards
+    </button>
+  </div>
+
+  <div id="deckSection" style="display:none;margin-top:24px">
+    <div class="deck-controls">
+      <div class="deck-stat" id="deckStat"></div>
+      <button class="btn" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);padding:8px 16px;font-size:13px" onclick="resetFlips()">Reset All</button>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let cardCount = 8;
+let flippedCards = new Set();
+
+function setCount(n, el) {
+  cardCount = n;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function generateCards() {
+  const text = document.getElementById('studyText').value.trim();
+  if (!text) { showToast('⚠ Please paste some study material first.','warn'); return; }
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  setLoading(btn, true, '🃏 Generate Flashcards');
+  flippedCards.clear();
+
+  try {
+    const result = await callClaude(
+      `You are an educational AI assistant. Create a list of high-quality study flashcards based on the provided material.
+Rules: Extract key definitions, concepts, historical facts, or formulas. Keep questions concise and answers precise.
+Format: Return your response EXACTLY as a raw JSON array of objects. Do not include introductory text or conversational greetings.
+Expected JSON Structure:
+[
+  {"q": "Question or term here", "a": "Answer or description here"}
+]`,
+      `Make ${cardCount} flashcards from this content:\n\n${text}`
+    );
+    
+    // Robust extraction logic
+    let cleanedText = result.trim();
+    const firstBracket = cleanedText.indexOf('[');
+    const lastBracket = cleanedText.lastIndexOf(']');
+    if (firstBracket !== -1 && lastBracket !== -1) {
+      cleanedText = cleanedText.substring(firstBracket, lastBracket + 1);
+    }
+
+    const cards = JSON.parse(cleanedText);
+    renderCards(cards);
+  } catch (e) {
+    showToast('✗ Error — try again','err');
+  }
+  setLoading(btn, false, '🃏 Generate Flashcards');
+}
+
+function renderCards(cards) {
+  const grid = document.getElementById('cardsGrid');
+  const section = document.getElementById('deckSection');
+  section.style.display = 'block';
+  document.getElementById('deckStat').textContent = `${cards.length} cards · tap to flip`;
+  grid.innerHTML = '';
+  cards.forEach((card, i) => {
+    const el = document.createElement('div');
+    el.className = 'flashcard';
+    el.innerHTML = `
+      <div>
+        <div class="card-num">Card ${i+1}</div>
+        <div class="card-front-content"><div class="card-q">${card.q}</div><div class="card-hint">tap to reveal ↓</div></div>
+        <div class="card-back-content">${card.a}</div>
+      </div>`;
+    el.addEventListener('click', () => {
+      el.classList.toggle('flipped');
+      if (el.classList.contains('flipped')) flippedCards.add(i);
+      else flippedCards.delete(i);
+      document.getElementById('deckStat').textContent = `${cards.length} cards · ${flippedCards.size} reviewed`;
+    });
+    grid.appendChild(el);
+  });
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetFlips() {
+  document.querySelectorAll('.flashcard').forEach(c => c.classList.remove('flipped'));
+  flippedCards.clear();
+  const stat = document.getElementById('deckStat');
+  const total = document.querySelectorAll('.flashcard').length;
+  stat.textContent = `${total} cards · tap to flip`;
+}
+</script>
+</body>
+</html>

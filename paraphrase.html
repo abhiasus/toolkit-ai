@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paraphraser — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page" style="max-width:980px">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ffd93d22">🔁</div>
+    <h1 class="tool-title" style="color:#ffd93d">Paraphraser</h1>
+    <p class="tool-desc">Rephrase your text in 6 different styles while keeping the same meaning.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Select paraphrase mode</div>
+    <div class="para-mode-grid" id="modeGrid">
+      <div class="para-card active" style="border-color:#ffd93d;color:#ffd93d" onclick="setMode('fluency',this,'#ffd93d')">
+        <div style="font-size:20px;margin-bottom:4px">✨</div>Fluency<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:2px">Natural & smooth</div>
+      </div>
+      <div class="para-card" onclick="setMode('formal',this,'#4d96ff')">
+        <div style="font-size:20px;margin-bottom:4px">👔</div>Formal<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:2px">Professional tone</div>
+      </div>
+      <div class="para-card" onclick="setMode('creative',this,'#c77dff')">
+        <div style="font-size:20px;margin-bottom:4px">🎨</div>Creative<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:2px">Vivid & engaging</div>
+      </div>
+      <div class="para-card" onclick="setMode('shorten',this,'#ff6b6b')">
+        <div style="font-size:20px;margin-bottom:4px">⚡</div>Shorten<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:2px">Concise version</div>
+      </div>
+      <div class="para-card" onclick="setMode('expand',this,'#6bcb77')">
+        <div style="font-size:20px;margin-bottom:4px">📖</div>Expand<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:2px">Detailed version</div>
+      </div>
+      <div class="para-card" onclick="setMode('simple',this,'#06d6a0')">
+        <div style="font-size:20px;margin-bottom:4px">🔍</div>Simplify<div style="font-size:10px;color:var(--muted);font-weight:400;margin-top:2px">Easy to read</div>
+      </div>
+    </div>
+    <div class="label">Your text</div>
+    <textarea id="paraText" style="min-height:160px" placeholder="Paste the text you want to paraphrase..."></textarea>
+    <button class="btn btn-full" id="runBtn" style="background:#ffd93d;color:#000;margin-top:14px" onclick="runPara()">🔁 Paraphrase</button>
+    <div class="diff-row" style="margin-top:20px">
+      <div>
+        <div class="panel-label">Original</div>
+        <div class="output-box" id="originalBox" style="min-height:160px"><span class="output-placeholder">Original text shown here after paraphrasing.</span></div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="panel-label">Paraphrased</div>
+          <button class="copy-btn" onclick="copyText(document.getElementById('output').innerText,this)" style="margin-bottom:8px">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'paraphrased.txt\')">⬇</button>
+        </div>
+        <div class="output-box" id="output" style="min-height:160px"><span class="output-placeholder">Paraphrased version will appear here.</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let paraMode = 'fluency';
+const systems = {
+  fluency: 'Paraphrase the text to be more natural, fluent and easy to read. Fix awkward phrasing. Keep all meaning. Output only the paraphrased text.',
+  formal: 'Rewrite in a formal, professional tone suitable for business or academic use. Keep all information. Output only the rewritten text.',
+  creative: 'Rewrite in a creative, engaging, vivid style with interesting word choices and imagery. Keep meaning. Output only the rewritten text.',
+  shorten: 'Shorten this text by at least 40% while keeping ALL key information. Be concise. Output only the shortened text.',
+  expand: 'Expand this text with more detail, examples, and explanation. Make it at least 50% longer. Output only the expanded text.',
+  simple: 'Rewrite using simple, clear language a 12-year-old would understand. Short sentences, common words, no jargon. Output only the simplified text.'
+};
+
+function setMode(m, el, color) {
+  paraMode = m;
+  document.querySelectorAll('.para-card').forEach(c => {
+    c.classList.remove('active');
+    c.style.borderColor = '';
+    c.style.color = '';
+  });
+  el.classList.add('active');
+  el.style.borderColor = color;
+  el.style.color = color;
+}
+
+async function runPara() {
+  const text = document.getElementById('paraText').value.trim();
+  if (!text) { showToast('⚠ Please paste some text first.','warn'); return; }
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '🔁 Paraphrase');
+  showOutput(document.getElementById('originalBox'), text);
+  try {
+    const result = await callClaude(systems[paraMode], text);
+    showOutput(document.getElementById('output'), result);
+  } catch(e) { showOutput(document.getElementById('output'), 'Error: ' + e.message, true); }
+  setLoading(btn, false, '🔁 Paraphrase');
+}
+</script>
+</body>
+</html>

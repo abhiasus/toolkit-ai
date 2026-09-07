@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PDF Summarizer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ff6b6b22">📄</div>
+    <h1 class="tool-title" style="color:#ff6b6b">PDF Summarizer</h1>
+    <p class="tool-desc">Upload PDFs up to 50MB or paste text directly. Get structured summaries with key points, arguments, and takeaways.</p>
+  </div>
+
+  <div class="tool-card">
+    <div class="tab-row">
+      <button class="tab active" id="tab-upload" onclick="switchTab('upload')" style="border-color:#ff6b6b44;color:#ff6b6b">📁 Upload PDF</button>
+      <button class="tab" id="tab-paste" onclick="switchTab('paste')">📝 Paste Text</button>
+    </div>
+
+    <div id="section-upload">
+      <div class="file-drop" id="dropZone">
+        <input type="file" id="pdfFile" accept=".pdf" onchange="handleFile(this.files[0])">
+        <div id="dropLabel">
+          <div style="font-size:32px;margin-bottom:10px">📄</div>
+          <div style="font-weight:600;color:#ccc">Drop your PDF here or click to browse</div>
+          <div style="font-size:12px;color:#6bcb77;margin-top:6px">✓ Supports up to 50MB · Multi-page PDFs fully supported</div>
+        </div>
+      </div>
+      <div class="progress-wrap" id="progressWrap" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="background:#ff6b6b"></div></div>
+        <div class="progress-label" id="progressLabel">Extracting text...</div>
+      </div>
+    </div>
+
+    <div id="section-paste" style="display:none">
+      <div class="label">Paste your text</div>
+      <textarea id="pasteText" placeholder="Paste PDF content, article, chapter, or any long text here..." style="min-height:200px" oninput="updateWordCount()"></textarea>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px" id="wordCount">0 words</div>
+    </div>
+
+    <div class="label" style="margin-top:20px">Summary style</div>
+    <div class="chips">
+      <button class="chip active" onclick="setStyle('detailed',this)">📑 Detailed</button>
+      <button class="chip" onclick="setStyle('bullet',this)">• Bullet Points</button>
+      <button class="chip" onclick="setStyle('short',this)">⚡ Short</button>
+      <button class="chip" onclick="setStyle('academic',this)">🎓 Academic</button>
+    </div>
+
+    <button class="btn btn-full" id="runBtn" style="background:#ff6b6b;color:#000;margin-top:20px" onclick="runSummary()">
+      ✨ Summarize
+    </button>
+
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Summary</span>
+        <button class="copy-btn" onclick="copyOutput()">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'summary.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output" style="max-height:500px">
+        <span class="output-placeholder">Your summary will appear here. Upload a PDF or paste text above.</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+
+<script src="shared.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let extractedText = '';
+let summaryStyle = 'detailed';
+let activeTab = 'upload';
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('section-upload').style.display = tab === 'upload' ? 'block' : 'none';
+  document.getElementById('section-paste').style.display = tab === 'paste' ? 'block' : 'none';
+  document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
+  document.getElementById('tab-paste').classList.toggle('active', tab === 'paste');
+  if (tab === 'upload') {
+    document.getElementById('tab-upload').style.cssText = 'border-color:#ff6b6b44;color:#ff6b6b';
+    document.getElementById('tab-paste').style.cssText = '';
+  } else {
+    document.getElementById('tab-paste').style.cssText = 'border-color:#ff6b6b44;color:#ff6b6b';
+    document.getElementById('tab-upload').style.cssText = '';
+  }
+}
+
+function setStyle(s, el) {
+  summaryStyle = s;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updateWordCount() {
+  const words = document.getElementById('pasteText').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wordCount').textContent = words.toLocaleString() + ' words';
+}
+
+async function handleFile(file) {
+  if (!file) return;
+  if (file.size > 52428800) { showToast('⚠ File is too large. Max 50MB supported.','warn'); return; }
+  const mb = (file.size / 1048576).toFixed(1);
+  document.getElementById('dropLabel').innerHTML = `
+    <div style="font-size:28px;margin-bottom:8px">✅</div>
+    <div style="color:#6bcb77;font-weight:600">${file.name}</div>
+    <div style="font-size:12px;color:#555;margin-top:4px">${mb} MB · Click to change</div>`;
+  document.getElementById('dropZone').classList.add('has-file');
+
+  const wrap = document.getElementById('progressWrap');
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  wrap.style.display = 'block';
+  fill.style.width = '0%';
+  label.textContent = 'Reading PDF...';
+
+  window.onPDFProgress = (cur, total) => {
+    fill.style.width = Math.round((cur / total) * 100) + '%';
+    label.textContent = `Extracting text... page ${cur} of ${total}`;
+  };
+
+  try {
+    extractedText = await extractPDFText(file);
+    label.textContent = `✓ Done — ${extractedText.split(/\s+/).length.toLocaleString()} words extracted`;
+    fill.style.background = '#6bcb77';
+  } catch (e) {
+    label.textContent = '⚠ Error reading PDF: ' + e.message;
+    fill.style.background = '#ff6b6b';
+  }
+}
+
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+async function runSummary() {
+  const text = activeTab === 'upload' ? extractedText : document.getElementById('pasteText').value.trim();
+  if (!text) { showToast('⚠ Please upload a PDF or paste text first.','warn'); return; }
+
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '✨ Summarize');
+
+  const stylePrompts = {
+    detailed: 'Create a detailed structured summary with: 1) Overview paragraph, 2) Key Points (bullet list), 3) Main Arguments or Themes, 4) Important Details, 5) Conclusion/Takeaways.',
+    bullet: 'Summarize into clean bullet points only. Group by theme. Use sub-bullets for details. Be concise.',
+    short: 'Write a single clear paragraph (max 150 words) capturing the core idea and most important point.',
+    academic: 'Write a formal academic summary covering thesis, methodology (if any), key findings, and scholarly significance.'
+  };
+
+  const MAX_CHARS = 60000;
+  let inputText = text;
+  let prefix = '';
+  if (text.length > MAX_CHARS) {
+    const chunks = [];
+    for (let i = 0; i < text.length; i += MAX_CHARS) chunks.push(text.slice(i, i + MAX_CHARS));
+    prefix = `(Note: This is a ${Math.round(text.length/1000)}k character document summarized in ${Math.min(chunks.length,5)} passes)\n\n`;
+    const chunkSummaries = [];
+    const out = document.getElementById('output');
+    for (let i = 0; i < Math.min(chunks.length, 5); i++) {
+      out.innerHTML = `<span class="output-placeholder">Summarizing chunk ${i+1} of ${Math.min(chunks.length,5)}...</span>`;
+      try {
+        const r = await callClaude('Summarize this section of a larger document. Be thorough but concise.', chunks[i]);
+        chunkSummaries.push(`[Section ${i+1}]\n${r}`);
+      } catch(e) { chunkSummaries.push(`[Section ${i+1} error: ${e.message}]`); }
+    }
+    inputText = chunkSummaries.join('\n\n');
+  }
+
+  try {
+    const result = await callClaude('You are an expert academic summarizer. ' + stylePrompts[summaryStyle], prefix + inputText);
+    showOutput(document.getElementById('output'), result);
+  } catch (e) {
+    showOutput(document.getElementById('output'), 'Error: ' + e.message, true);
+  }
+  setLoading(btn, false, '✨ Summarize');
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>

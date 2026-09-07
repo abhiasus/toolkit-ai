@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cover Letter Generator — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#6bcb7722">✉️</div>
+    <h1 class="tool-title" style="color:#6bcb77">Cover Letter Generator</h1>
+    <p class="tool-desc">Fill in a few fields and get a personalized, professional cover letter tailored to the job and company.</p>
+  </div>
+
+  <div class="tool-card">
+    <div class="row row-2">
+      <div>
+        <div class="label">Your Full Name</div>
+        <input type="text" id="name" placeholder="Jane Doe">
+      </div>
+      <div>
+        <div class="label">Your Email (optional)</div>
+        <input type="text" id="email" placeholder="jane@email.com">
+      </div>
+    </div>
+
+    <div class="row row-2" style="margin-top:0">
+      <div>
+        <div class="label">Job Title / Role</div>
+        <input type="text" id="job" placeholder="ML Engineer Intern">
+      </div>
+      <div>
+        <div class="label">Company Name</div>
+        <input type="text" id="company" placeholder="Google, OpenAI, etc.">
+      </div>
+    </div>
+
+    <div class="label">Hiring Manager Name (optional)</div>
+    <input type="text" id="manager" placeholder="Mr. Smith / leave blank for 'Hiring Manager'">
+
+    <div class="label">Your background, skills & experience</div>
+    <textarea id="background" style="min-height:120px" placeholder="e.g. CS student at Utrecht University, 2 years Python, built ML dashboards, cybersecurity internship, strong interest in AI..."></textarea>
+
+    <div class="label">Job description or key requirements (optional)</div>
+    <textarea id="jobdesc" style="min-height:80px" placeholder="Paste relevant parts of the job description to get a more tailored letter..."></textarea>
+
+    <div class="label">Tone</div>
+    <div class="chips">
+      <button class="chip active" onclick="setTone('professional',this)">Professional</button>
+      <button class="chip" onclick="setTone('enthusiastic',this)">Enthusiastic</button>
+      <button class="chip" onclick="setTone('concise',this)">Concise</button>
+      <button class="chip" onclick="setTone('creative',this)">Creative</button>
+    </div>
+
+    <button class="btn btn-full" id="runBtn" style="background:#6bcb77;color:#000;margin-top:20px" onclick="runCover()">
+      ✉️ Generate Cover Letter
+    </button>
+
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Your Cover Letter</span>
+        <button class="copy-btn" onclick="copyOutput()" style="float:none">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'cover-letter.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output" style="max-height:600px">
+        <span class="output-placeholder">Your cover letter will appear here. Fill in the fields above and click Generate.</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let tone = 'professional';
+function setTone(t, el) {
+  tone = t;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function runCover() {
+  const job = document.getElementById('job').value.trim();
+  const bg = document.getElementById('background').value.trim();
+  if (!job || !bg) { showToast('⚠ Please enter the job title and your background.','warn'); return; }
+
+  const name = document.getElementById('name').value.trim() || 'Applicant';
+  const email = document.getElementById('email').value.trim();
+  const company = document.getElementById('company').value.trim() || 'the company';
+  const manager = document.getElementById('manager').value.trim() || 'Hiring Manager';
+  const jobdesc = document.getElementById('jobdesc').value.trim();
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '✉️ Generate Cover Letter');
+
+  const toneMap = {
+    professional: 'formal and professional',
+    enthusiastic: 'warm, enthusiastic, and genuine',
+    concise: 'concise and punchy (max 3 short paragraphs)',
+    creative: 'creative and memorable while remaining professional'
+  };
+
+  const system = `You are a professional career writer who crafts exceptional cover letters. Write a ${toneMap[tone]} cover letter. 
+Rules: No generic filler phrases like "I am writing to express my interest". Be specific. Reference actual skills and experiences. 
+Format: Full letter with date, greeting, 3-4 paragraphs, sign-off. Output only the letter text.`;
+
+  const prompt = `Name: ${name}${email ? '\nEmail: ' + email : ''}
+Job: ${job}
+Company: ${company}
+Addressed to: ${manager}
+Background: ${bg}${jobdesc ? '\n\nJob description highlights:\n' + jobdesc : ''}`;
+
+  try {
+    const result = await callClaude(system, prompt);
+    showOutput(document.getElementById('output'), result);
+  } catch (e) {
+    showOutput(document.getElementById('output'), 'Error: ' + e.message, true);
+  }
+  setLoading(btn, false, '✉️ Generate Cover Letter');
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
+    const b = document.querySelector('.copy-btn');
+    b.textContent = '✓ Copied!'; setTimeout(() => b.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>

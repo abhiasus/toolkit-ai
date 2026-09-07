@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tone Analyzer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ff6b6b22">🎭</div>
+    <h1 class="tool-title" style="color:#ff6b6b">Tone Analyzer</h1>
+    <p class="tool-desc">Detect the tone, sentiment, emotions, and formality level of any text with percentage breakdowns.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Your text</div>
+    <textarea id="toneText" style="min-height:180px" placeholder="Paste any text — email, message, article, speech, review..."></textarea>
+    <button class="btn btn-full" id="runBtn" style="background:#ff6b6b;color:#000;margin-top:14px" onclick="runTone()">🎭 Analyze Tone</button>
+
+    <div id="toneResults" style="display:none;margin-top:24px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px" class="row-2">
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:center">
+          <div style="font-size:32px;margin-bottom:6px" id="sentimentEmoji">😐</div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px">Overall Sentiment</div>
+          <div style="font-size:18px;font-weight:700" id="sentimentLabel">Neutral</div>
+        </div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:12px;text-align:center">
+          <div style="font-size:32px;margin-bottom:6px" id="formalityEmoji">👔</div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px">Formality Level</div>
+          <div style="font-size:18px;font-weight:700" id="formalityLabel">Neutral</div>
+        </div>
+      </div>
+
+      <div class="label">Tone breakdown</div>
+      <div id="toneBars" style="margin-top:10px"></div>
+
+      <div class="label" style="margin-top:20px">Emotions detected</div>
+      <div id="emotionTags" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+
+      <div class="label" style="margin-top:20px">Analysis</div>
+      <div class="output-box" id="toneAnalysis" style="min-height:80px"></div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+const TONE_COLORS = { positive:'#6bcb77', negative:'#ff6b6b', neutral:'#888', formal:'#4d96ff', casual:'#ffd93d', confident:'#c77dff', uncertain:'#ff9a3c', analytical:'#06d6a0', emotional:'#ff6b6b', persuasive:'#ffd93d', informative:'#4d96ff' };
+
+async function runTone() {
+  const text = document.getElementById('toneText').value.trim();
+  if (!text) { showToast('⚠ Please paste some text.','warn'); return; }
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('toneAnalysis'));
+  setLoading(btn, true, '🎭 Analyze Tone');
+
+  const sys = `Analyze the tone of the given text. Respond ONLY with valid JSON (no markdown):
+{
+  "sentiment": "positive|negative|neutral|mixed",
+  "sentiment_score": 75,
+  "formality": "very formal|formal|neutral|casual|very casual",
+  "formality_score": 60,
+  "tones": [
+    {"name": "Confident", "score": 80},
+    {"name": "Analytical", "score": 65},
+    {"name": "Informative", "score": 70}
+  ],
+  "emotions": ["joy", "trust", "anticipation"],
+  "analysis": "2-3 sentence analysis of the overall tone and what it communicates"
+}
+tones: pick 4-6 most relevant from: Positive, Negative, Formal, Casual, Confident, Uncertain, Analytical, Emotional, Persuasive, Informative, Humorous, Serious, Empathetic, Critical.
+scores: 0-100. emotions: list up to 5 detected emotions.`;
+
+  try {
+    const raw = await callClaude(sys, text);
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderTone(data);
+  } catch(e) { showToast('✗ '+e.message,'err'); }
+  setLoading(btn, false, '🎭 Analyze Tone');
+}
+
+function renderTone(d) {
+  document.getElementById('toneResults').style.display = 'block';
+  const sEmojis = { positive:'😊', negative:'😠', neutral:'😐', mixed:'🤔' };
+  const fEmojis = { 'very formal':'🎩', formal:'👔', neutral:'😐', casual:'😎', 'very casual':'🤙' };
+  document.getElementById('sentimentEmoji').textContent = sEmojis[d.sentiment] || '😐';
+  document.getElementById('sentimentLabel').textContent = d.sentiment?.charAt(0).toUpperCase() + d.sentiment?.slice(1) + ` (${d.sentiment_score}%)`;
+  document.getElementById('formalityEmoji').textContent = fEmojis[d.formality] || '😐';
+  document.getElementById('formalityLabel').textContent = d.formality?.replace(/\b\w/g,c=>c.toUpperCase()) + ` (${d.formality_score}%)`;
+
+  const barsEl = document.getElementById('toneBars');
+  barsEl.innerHTML = (d.tones||[]).map(t => {
+    const color = TONE_COLORS[t.name.toLowerCase()] || '#4d96ff';
+    return `<div class="tone-row">
+      <div class="tone-label">${t.name}</div>
+      <div style="flex:1"><div class="tone-bar"><div class="tone-fill" style="width:${t.score}%;background:${color}"></div></div></div>
+      <div class="tone-pct">${t.score}%</div>
+    </div>`;
+  }).join('');
+
+  const emotEl = document.getElementById('emotionTags');
+  emotEl.innerHTML = (d.emotions||[]).map(e =>
+    `<span style="padding:5px 12px;border-radius:20px;background:var(--bg3);border:1px solid var(--border2);font-size:12px;color:var(--text)">${e}</span>`
+  ).join('');
+
+  showOutput(document.getElementById('toneAnalysis'), d.analysis || '');
+  document.getElementById('toneResults').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

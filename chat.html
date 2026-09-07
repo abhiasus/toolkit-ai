@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Chat — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page" style="max-width:1000px">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#4d96ff22">💬</div>
+    <h1 class="tool-title" style="color:#4d96ff">AI Chat</h1>
+    <p class="tool-desc">Multi-turn chat with history, custom system prompt, and full conversation context.</p>
+  </div>
+  <div class="tool-card" style="margin-bottom:12px">
+    <div class="row row-2" style="gap:12px">
+      <div>
+        <div class="label">System Prompt (optional)</div>
+        <input type="text" id="sysPrompt" placeholder="You are a helpful assistant..." value="You are a helpful, knowledgeable assistant. Be concise and clear.">
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:8px">
+        <button class="btn" style="background:var(--bg3);color:var(--muted);border:1px solid var(--border2);font-size:13px;padding:10px 16px" onclick="clearChat()">🗑 Clear</button>
+        <button class="btn" style="background:var(--bg3);color:var(--muted);border:1px solid var(--border2);font-size:13px;padding:10px 16px" onclick="copyChat()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+  <div class="tool-card" style="padding:0;overflow:hidden">
+    <div class="chat-wrap">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-bubble ai">👋 Hey! I'm your AI assistant. Ask me anything — questions, writing help, coding, math, brainstorming, or just chat!</div>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="Type a message... (Shift+Enter for new line, Enter to send)" onkeydown="handleKey(event)"></textarea>
+        <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let history = [];
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const btn = document.getElementById('sendBtn');
+  input.value = '';
+  btn.disabled = true;
+
+  appendBubble(msg, 'user');
+  history.push({ role: 'user', content: msg });
+
+  const thinking = appendBubble('Thinking...', 'ai thinking');
+  try {
+    const sys = document.getElementById('sysPrompt').value.trim();
+    // Build full prompt with history
+    const fullHistory = history.slice(-20); // last 20 msgs
+    let prompt = '';
+    for (const m of fullHistory.slice(0,-1)) {
+      prompt += (m.role === 'user' ? 'User: ' : 'Assistant: ') + m.content + '\n\n';
+    }
+    prompt += 'User: ' + msg + '\n\nAssistant:';
+    const reply = await callClaude(sys, prompt);
+    thinking.remove();
+    const bubble = appendBubble(reply, 'ai');
+    history.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    thinking.textContent = '⚠ ' + e.message;
+    thinking.classList.remove('thinking');
+  }
+  btn.disabled = false;
+  input.focus();
+}
+
+function appendBubble(text, cls) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-bubble ' + cls;
+  div.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function clearChat() {
+  history = [];
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML = '<div class="chat-bubble ai">👋 Chat cleared! Start a new conversation.</div>';
+}
+
+function copyChat() {
+  const text = history.map(m => (m.role === 'user' ? 'You: ' : 'AI: ') + m.content).join('\n\n');
+  navigator.clipboard.writeText(text).then(() => showToast('✓ Copied!','ok'));
+}
+</script>
+</body>
+</html>

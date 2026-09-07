@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Idea Generator — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#00c9a722">💡</div>
+    <h1 class="tool-title" style="color:#00c9a7">Idea Generator</h1>
+    <p class="tool-desc">Generate creative, actionable ideas for any topic — projects, businesses, content, names, features, and more.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Idea category</div>
+    <div class="chips" id="catChips">
+      <button class="chip active" onclick="setCat('general',this)">✨ General</button>
+      <button class="chip" onclick="setCat('business',this)">💼 Business</button>
+      <button class="chip" onclick="setCat('content',this)">📹 Content</button>
+      <button class="chip" onclick="setCat('app',this)">📱 App / Product</button>
+      <button class="chip" onclick="setCat('names',this)">🏷 Names</button>
+      <button class="chip" onclick="setCat('project',this)">🛠 Projects</button>
+      <button class="chip" onclick="setCat('marketing',this)">📣 Marketing</button>
+      <button class="chip" onclick="setCat('essay',this)">✍ Essay Topics</button>
+    </div>
+    <div class="row row-2" style="margin-top:0">
+      <div>
+        <div class="label">Topic / Domain</div>
+        <input type="text" id="ideaTopic" placeholder="e.g. AI tools, fitness app, YouTube channel...">
+      </div>
+      <div>
+        <div class="label">Number of ideas</div>
+        <div class="chips" id="countChips" style="margin-top:8px">
+          <button class="chip" onclick="setCount(5,this)">5</button>
+          <button class="chip active" onclick="setCount(10,this)">10</button>
+          <button class="chip" onclick="setCount(15,this)">15</button>
+          <button class="chip" onclick="setCount(20,this)">20</button>
+        </div>
+      </div>
+    </div>
+    <div class="label">Additional context (optional)</div>
+    <textarea id="ideaContext" style="min-height:80px" placeholder="Target audience, constraints, style, budget, location..."></textarea>
+    <button class="btn btn-full" id="runBtn" style="background:#00c9a7;color:#000;margin-top:14px" onclick="runIdeas()">💡 Generate Ideas</button>
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Ideas</span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('output').innerText,this)">Copy All</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'ideas.txt\')">⬇</button>
+      </div>
+      <div id="ideasGrid" style="display:none;gap:10px;flex-wrap:wrap;margin-top:8px"></div>
+      <div class="output-box" id="output"><span class="output-placeholder">Your ideas will appear here. Enter a topic and click Generate Ideas.</span></div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let ideaCat = 'general', ideaCount = 10;
+const catSystems = {
+  general: 'Generate creative, practical, original ideas.',
+  business: 'Generate viable business ideas with brief market opportunity notes.',
+  content: 'Generate content ideas (videos, posts, articles) with catchy titles.',
+  app: 'Generate app/product ideas with a one-line value proposition each.',
+  names: 'Generate creative, memorable names. Explain the meaning/vibe of each.',
+  project: 'Generate project ideas with a brief description of what to build.',
+  marketing: 'Generate creative marketing campaign ideas with the core hook.',
+  essay: 'Generate compelling essay/article topics with a brief angle for each.'
+};
+function setCat(c, el) { ideaCat = c; document.querySelectorAll('#catChips .chip').forEach(x => x.classList.remove('active')); el.classList.add('active'); }
+function setCount(n, el) { ideaCount = n; document.querySelectorAll('#countChips .chip').forEach(x => x.classList.remove('active')); el.classList.add('active'); }
+
+async function runIdeas() {
+  const topic = document.getElementById('ideaTopic').value.trim();
+  if (!topic) { showToast('⚠ Please enter a topic.','warn'); return; }
+  const context = document.getElementById('ideaContext').value.trim();
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '💡 Generate Ideas');
+
+  const sys = `${catSystems[ideaCat]} Generate exactly ${ideaCount} ideas for the given topic. 
+Format: Number each idea. Bold the idea title. One line description after.
+Example:
+1. **Idea Title** — Brief description of what it is and why it works.
+
+Be creative, diverse, and actionable. Avoid generic or obvious ideas. Output only the numbered list.`;
+
+  const prompt = `Topic: ${topic}${context ? '\nContext: ' + context : ''}`;
+  try {
+    const result = await callClaude(sys, prompt);
+    document.getElementById('ideasGrid').style.display = 'none';
+    showOutput(document.getElementById('output'), result);
+  } catch(e) { showOutput(document.getElementById('output'), 'Error: ' + e.message, true); }
+  setLoading(btn, false, '💡 Generate Ideas');
+}
+</script>
+</body>
+</html>

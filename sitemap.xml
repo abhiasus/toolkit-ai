@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://toolkitai.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://toolkitai.vercel.app/chat.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/translate.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/grammar.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/paraphrase.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/summarize.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/tone.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/email.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/ideas.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/pdf.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/convert.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/resume.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/cover.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/flash.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/code.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/essay.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/quiz.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/image-gen.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/data-analyzer.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/meeting-notes.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/social.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/recipe.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/workout.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/travel.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/study-planner.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/merge.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/help.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolkitai.vercel.app/privacy.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+</urlset>

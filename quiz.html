@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz Generator — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<style>
+#quizSection{display:none}
+.quiz-wrap{max-width:620px;margin:0 auto}
+.quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.quiz-counter{font-size:13px;color:var(--muted)}
+.quiz-score-live{font-size:13px;color:#00c9a7;font-weight:600}
+.quiz-progress{height:4px;background:var(--border);border-radius:2px;margin-bottom:28px;overflow:hidden}
+.quiz-progress-fill{height:100%;background:#00c9a7;border-radius:2px;transition:width .4s ease}
+.quiz-q{font-size:17px;font-weight:500;line-height:1.55;margin-bottom:20px;color:#ddd}
+.quiz-options{display:flex;flex-direction:column;gap:10px}
+.quiz-opt{padding:14px 18px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-size:14px;transition:all .15s;text-align:left;color:#ccc;font-family:'DM Sans',sans-serif;width:100%;position:relative}
+.quiz-opt::before{content:attr(data-letter);position:absolute;left:16px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:22px;text-align:center;transition:all .15s}
+.quiz-opt{padding-left:52px}
+.quiz-opt:hover:not(:disabled){border-color:#444;background:#161626}
+.quiz-opt:hover:not(:disabled)::before{background:#333}
+.quiz-opt.correct{border-color:#6bcb77!important;background:#0a1f0d!important;color:#6bcb77!important}
+.quiz-opt.correct::before{background:#6bcb7722!important;color:#6bcb77!important}
+.quiz-opt.wrong{border-color:#ff6b6b!important;background:#1f0a0a!important;color:#ff6b6b!important}
+.quiz-opt.wrong::before{background:#ff6b6b22!important;color:#ff6b6b!important}
+.quiz-opt.reveal-correct{border-color:#6bcb7744!important;color:#6bcb7788!important}
+.feedback-box{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13px;line-height:1.5;display:none}
+.feedback-box.correct{background:#0a1f0d;border:1px solid #6bcb7733;color:#6bcb77}
+.feedback-box.wrong{background:#1f0a0a;border:1px solid #ff6b6b33;color:#ff9090}
+.next-btn{margin-top:18px;width:100%}
+.score-wrap{text-align:center;padding:40px 20px}
+.score-emoji{font-size:52px;margin-bottom:12px}
+.score-num{font-family:'Syne',sans-serif;font-size:56px;font-weight:900;line-height:1}
+.score-sub{color:var(--muted);font-size:15px;margin:8px 0 32px}
+.score-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#00c9a722">🧠</div>
+    <h1 class="tool-title" style="color:#00c9a7">Quiz Generator</h1>
+    <p class="tool-desc">Enter any topic or paste text. Get a multi-question quiz with instant feedback and scoring.</p>
+  </div>
+
+  <!-- Setup -->
+  <div class="tool-card" id="setupSection">
+    <div class="row row-2">
+      <div>
+        <div class="label">Number of questions</div>
+        <div class="chips">
+          <button class="chip" onclick="setQCount(3,this)">3</button>
+          <button class="chip active" onclick="setQCount(5,this)">5</button>
+          <button class="chip" onclick="setQCount(8,this)">8</button>
+          <button class="chip" onclick="setQCount(10,this)">10</button>
+        </div>
+      </div>
+      <div>
+        <div class="label">Difficulty</div>
+        <select id="difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="label">Topic or paste text</div>
+    <textarea id="quizInput" style="min-height:140px" placeholder="Type a topic: 'Python basics', 'World War II', 'Machine Learning'\n\nOR paste a paragraph/notes to quiz from..."></textarea>
+
+    <button class="btn btn-full" id="genBtn" style="background:#00c9a7;color:#000;margin-top:16px" onclick="generateQuiz()">
+      🧠 Generate Quiz
+    </button>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quizSection">
+    <div class="tool-card quiz-wrap">
+      <!-- Question screen -->
+      <div id="questionScreen">
+        <div class="quiz-header">
+          <span class="quiz-counter" id="qCounter">Question 1 of 5</span>
+          <span class="quiz-score-live" id="livScore">Score: 0</span>
+        </div>
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="qProgress" style="width:0%"></div></div>
+        <div class="quiz-q" id="qText"></div>
+        <div class="quiz-options" id="qOptions"></div>
+        <div class="feedback-box" id="feedbackBox"></div>
+        <button class="btn next-btn" id="nextBtn" style="background:#00c9a7;color:#000;display:none" onclick="nextQuestion()">Next Question →</button>
+      </div>
+      <!-- Score screen -->
+      <div id="scoreScreen" style="display:none">
+        <div class="score-wrap">
+          <div class="score-emoji" id="scoreEmoji"></div>
+          <div class="score-num" id="scoreNum" style="color:#00c9a7"></div>
+          <div class="score-sub" id="scoreSub"></div>
+          <div class="score-actions">
+            <button class="btn" style="background:#00c9a7;color:#000" onclick="restartQuiz()">🔄 Try Again</button>
+            <button class="btn" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2)" onclick="newQuiz()">✨ New Quiz</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let qCount = 5;
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+function setQCount(n, el) {
+  qCount = n;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function generateQuiz() {
+  const input = document.getElementById('quizInput').value.trim();
+  if (!input) { showToast('⚠ Please enter a topic or paste some text.','warn'); return; }
+  const difficulty = document.getElementById('difficulty').value;
+  const btn = document.getElementById('genBtn');
+  startTimer();
+  setLoading(btn, true, '🧠 Generate Quiz');
+
+  try {
+    const result = await callClaude(
+      `You are a testing coordinator system. Generate an interactive multiple choice quiz.
+Rules: Build exactly ${qCount} distinct problems at ${difficulty} difficulty. 
+Provide 4 options for each question. Each option must start with "A. ", "B. ", "C. ", or "D. ".
+Format: Return your answer ONLY as a raw structured JSON array. Do not include markdown preamble blocks or conversational chatter.
+Expected Structure:
+[
+  {
+    "q": "The question string?",
+    "options": ["A. Choice", "B. Choice", "C. Choice", "D. Choice"],
+    "answer": "A. Choice",
+    "explanation": "Brief explanation."
+  }
+]`,
+      `Create a ${difficulty} ${qCount}-question quiz about: ${input}`
+    );
+
+    // Robust extraction logic
+    let cleanedText = result.trim();
+    const firstBracket = cleanedText.indexOf('[');
+    const lastBracket = cleanedText.lastIndexOf(']');
+    if (firstBracket !== -1 && lastBracket !== -1) {
+      cleanedText = cleanedText.substring(firstBracket, lastBracket + 1);
+    }
+
+    questions = JSON.parse(cleanedText);
+    startQuiz();
+  } catch (e) {
+    showToast('✗ Parse failed — try again','err');
+  }
+  setLoading(btn, false, '🧠 Generate Quiz');
+}
+
+function startQuiz() {
+  currentQ = 0; score = 0; answered = false;
+  document.getElementById('setupSection').style.display = 'none';
+  document.getElementById('quizSection').style.display = 'block';
+  document.getElementById('scoreScreen').style.display = 'none';
+  document.getElementById('questionScreen').style.display = 'block';
+  document.getElementById('quizSection').scrollIntoView({ behavior: 'smooth' });
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  const total = questions.length;
+  document.getElementById('qCounter').textContent = `Question ${currentQ + 1} of ${total}`;
+  document.getElementById('livScore').textContent = `Score: ${score}`;
+  document.getElementById('qProgress').style.width = (currentQ / total * 100) + '%';
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('feedbackBox').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  const opts = document.getElementById('qOptions');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.setAttribute('data-letter', opt.charAt(0));
+    btn.textContent = opt.substring(3); // remove "A. " prefix for display
+    btn.style.cssText = '';
+    btn.addEventListener('click', () => selectAnswer(opt, btn, q));
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(opt, btn, q) {
+  if (answered) return;
+  answered = true;
+  const correct = opt === q.answer;
+  if (correct) score++;
+
+  // Style all buttons
+  document.querySelectorAll('.quiz-opt').forEach(b => {
+    const bOpt = b.getAttribute('data-letter') + '. ' + b.textContent;
+    b.disabled = true;
+    if (bOpt === q.answer) b.classList.add('correct');
+    else if (b === btn && !correct) b.classList.add('wrong');
+    else b.classList.add('reveal-correct'); // dim others
+  });
+
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box ' + (correct ? 'correct' : 'wrong');
+  fb.textContent = correct ? '✓ Correct! ' + (q.explanation || '') : '✗ Incorrect. ' + (q.explanation || 'The correct answer is: ' + q.answer);
+  fb.style.display = 'block';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.style.display = 'block';
+  nextBtn.textContent = currentQ + 1 >= questions.length ? 'See Results →' : 'Next Question →';
+  document.getElementById('livScore').textContent = `Score: ${score}`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showScore();
+  } else {
+    showQuestion();
+  }
+}
+
+function showScore() {
+  document.getElementById('questionScreen').style.display = 'none';
+  document.getElementById('scoreScreen').style.display = 'block';
+  const pct = score / questions.length;
+  const emoji = pct === 1 ? '🏆' : pct >= .8 ? '🎉' : pct >= .6 ? '👍' : pct >= .4 ? '💪' : '📚';
+  const msg = pct === 1 ? 'Perfect score!' : pct >= .8 ? 'Excellent work!' : pct >= .6 ? 'Good job!' : pct >= .4 ? 'Keep practicing!' : 'Keep studying!';
+  document.getElementById('scoreEmoji').textContent = emoji;
+  document.getElementById('scoreNum').textContent = `${score}/${questions.length}`;
+  document.getElementById('scoreSub').textContent = msg + ` (${Math.round(pct*100)}%)`;
+  document.getElementById('qProgress').style.width = '100%';
+}
+
+function restartQuiz() {
+  startQuiz();
+}
+
+function newQuiz() {
+  document.getElementById('setupSection').style.display = 'block';
+  document.getElementById('quizSection').style.display = 'none';
+  document.getElementById('setupSection').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

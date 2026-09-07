@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Text Summarizer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ff9a3c22">📝</div>
+    <h1 class="tool-title" style="color:#ff9a3c">Text Summarizer</h1>
+    <p class="tool-desc">Summarize any text into bullet points, TLDR, key facts, or a full abstract.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Summary format</div>
+    <div class="summary-style-grid" id="styleGrid">
+      <div class="ss-card active" style="border-color:#ff9a3c;color:#ff9a3c" onclick="setStyle('bullet',this,'#ff9a3c')">📌 Bullet Points</div>
+      <div class="ss-card" onclick="setStyle('tldr',this,'#ff6b6b')">⚡ TLDR (1 sentence)</div>
+      <div class="ss-card" onclick="setStyle('keyfacts',this,'#4d96ff')">🔑 Key Facts</div>
+      <div class="ss-card" onclick="setStyle('abstract',this,'#c77dff')">📄 Abstract</div>
+    </div>
+    <div class="row row-2" style="margin-top:0">
+      <div>
+        <div class="label">Length</div>
+        <select id="lengthSel">
+          <option value="short">Short (brief)</option>
+          <option value="medium" selected>Medium</option>
+          <option value="detailed">Detailed</option>
+        </select>
+      </div>
+      <div>
+        <div class="label">Word count (approx)</div>
+        <div id="wordCountDisplay" style="padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--muted)">0 words</div>
+      </div>
+    </div>
+    <div class="label">Text to summarize</div>
+    <textarea id="sumText" style="min-height:200px" placeholder="Paste any article, chapter, document, or text..." oninput="updateWC()"></textarea>
+    <button class="btn btn-full" id="runBtn" style="background:#ff9a3c;color:#000;margin-top:14px" onclick="runSum()">📝 Summarize</button>
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Summary</span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('output').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'summary.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output"><span class="output-placeholder">Your summary will appear here.</span></div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let sumStyle = 'bullet';
+function updateWC() {
+  const w = document.getElementById('sumText').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wordCountDisplay').textContent = w.toLocaleString() + ' words';
+}
+function setStyle(s, el, color) {
+  sumStyle = s;
+  document.querySelectorAll('.ss-card').forEach(c => { c.classList.remove('active'); c.style.borderColor=''; c.style.color=''; });
+  el.classList.add('active'); el.style.borderColor = color; el.style.color = color;
+}
+async function runSum() {
+  const text = document.getElementById('sumText').value.trim();
+  if (!text) { showToast('⚠ Please paste some text first.','warn'); return; }
+  const length = document.getElementById('lengthSel').value;
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '📝 Summarize');
+  const sys = {
+    bullet: `Summarize the text as ${length} bullet points. Each bullet = one key idea. Start bullets with •. Cover all main points. Output only the bullet list.`,
+    tldr: `Write a single ${length === 'short' ? 'very short (1 sentence)' : length === 'medium' ? '2-3 sentence' : 'paragraph'} TLDR summary capturing the core message. Output only the TLDR.`,
+    keyfacts: `Extract ${length === 'short' ? '5' : length === 'medium' ? '8' : '12'} key facts from the text. Number them 1. 2. 3. etc. Each fact = one clear, specific statement. Output only the numbered list.`,
+    abstract: `Write a ${length} formal academic abstract (objective, methods if any, findings, conclusion). Output only the abstract.`
+  }[sumStyle];
+  try {
+    const result = await callClaude(sys, text);
+    showOutput(document.getElementById('output'), result);
+  } catch(e) { showOutput(document.getElementById('output'), 'Error: ' + e.message, true); }
+  setLoading(btn, false, '📝 Summarize');
+}
+</script>
+</body>
+</html>

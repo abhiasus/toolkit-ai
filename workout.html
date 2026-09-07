@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workout Planner — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#6bcb7722">💪</div>
+    <h1 class="tool-title" style="color:#6bcb77">Workout Planner</h1>
+    <p class="tool-desc">Get personalized workout plans based on your goals, fitness level, and available equipment.</p>
+  </div>
+  <div class="tool-card">
+  <div class="label">Goal</div>
+  <div class="chips" id="gChips">
+    <button class="chip active" onclick="setG(this,'Build Muscle')">💪 Muscle</button><button class="chip" onclick="setG(this,'Fat Loss')">🔥 Fat Loss</button><button class="chip" onclick="setG(this,'Endurance')">🏃 Endurance</button><button class="chip" onclick="setG(this,'Strength')">🏋️ Strength</button><button class="chip" onclick="setG(this,'Flexibility')">🧘 Flexibility</button><button class="chip" onclick="setG(this,'General Fitness')">⚡ General</button>
+  </div>
+  <div class="row row-3" style="margin-top:12px">
+    <div><div class="label">Level</div><select id="wLvl"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option></select></div>
+    <div><div class="label">Days/week</div><select id="wDays"><option>3 days</option><option selected>4 days</option><option>5 days</option><option>6 days</option></select></div>
+    <div><div class="label">Duration</div><select id="wDur"><option>30 min</option><option selected>45 min</option><option>60 min</option><option>90 min</option></select></div>
+  </div>
+  <div class="label">Equipment</div>
+  <div class="chips" id="eqChips">
+    <button class="chip active" onclick="togEq(this)">Bodyweight</button><button class="chip" onclick="togEq(this)">Dumbbells</button><button class="chip" onclick="togEq(this)">Barbell</button><button class="chip" onclick="togEq(this)">Resistance Bands</button><button class="chip" onclick="togEq(this)">Pull-up Bar</button><button class="chip" onclick="togEq(this)">Gym Access</button>
+  </div>
+  <div class="label">Notes / limitations</div>
+  <input type="text" id="wNote" placeholder="e.g. focus on core, knee pain, no jumping...">
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#6bcb77;color:#000;margin-top:14px" onclick="genW()">💪 Generate Plan</button>
+  <div id="workoutOut-wrap" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="label" style="margin:0">Result</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyText(document.getElementById('workoutOut').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput('workoutOut','workout-plan.txt')">⬇</button>
+      </div>
+    </div>
+    <div class="output-box" id="workoutOut" style="min-height:160px"></div>
+  </div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let wGoal='Build Muscle',wEq=['Bodyweight'];
+function setG(el,g){wGoal=g;document.querySelectorAll('#gChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function togEq(el){el.classList.toggle('active');wEq=Array.from(document.querySelectorAll('#eqChips .chip.active')).map(c=>c.textContent.trim());if(!wEq.length){el.classList.add('active');wEq=[el.textContent.trim()];}}
+async function genW(){
+  const btn=document.getElementById('runBtn');startTimer();showSkeleton(document.getElementById('workoutOut'));setLoading(btn,true,'💪 Generate Plan',true);
+  try{
+    const res=await callClaude('Certified personal trainer. Detailed workout plan: weekly schedule, warm-up(5min), exercises(name/sets/reps/rest), cool-down(5min), progressive overload tips.',
+      'Goal: '+wGoal+'\nLevel: '+document.getElementById('wLvl').value+'\nDays/week: '+document.getElementById('wDays').value+'\nDuration: '+document.getElementById('wDur').value+'\nEquipment: '+wEq.join(', ')+'\nNotes: '+(document.getElementById('wNote').value||'None'));
+    showOutput(document.getElementById('workoutOut'),res);document.getElementById('workoutOut-wrap').style.display='block';
+    document.getElementById('workoutOut-wrap').scrollIntoView({behavior:'smooth'});showToast('Plan ready in '+getElapsed(),'ok');}
+  catch(e){showOutput(document.getElementById('workoutOut'),'Error: '+e.message,true);document.getElementById('workoutOut-wrap').style.display='block';}
+  setLoading(btn,false,'💪 Generate Plan');
+}
+</script>
+</body></html>

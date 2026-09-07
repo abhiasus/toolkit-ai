@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meeting Notes — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#00c9a722">🗒</div>
+    <h1 class="tool-title" style="color:#00c9a7">Meeting Notes</h1>
+    <p class="tool-desc">Paste a transcript or rough notes. Get structured notes with summary, action items, and decisions.</p>
+  </div>
+  <div class="tool-card">
+  <div class="row row-2">
+    <div><div class="label">Title (optional)</div><input type="text" id="mTitle" placeholder="Weekly Standup"></div>
+    <div><div class="label">Meeting type</div><select id="mType"><option value="general">General</option><option value="standup">Daily Standup</option><option value="planning">Sprint Planning</option><option value="review">Sprint Review</option><option value="retrospective">Retrospective</option><option value="1on1">1-on-1</option><option value="client">Client Meeting</option><option value="brainstorm">Brainstorming</option></select></div>
+  </div>
+  <div class="label">Paste transcript / notes</div>
+  <textarea id="transcript" style="min-height:200px" placeholder="Paste meeting transcript here...&#10;&#10;John: We need to finish login by Friday.&#10;Sarah: I will handle the API.&#10;Mike: Design is ready."></textarea>
+  <div class="label">Format</div>
+  <div class="chips" id="mFChips">
+    <button class="chip active" onclick="setMF('structured',this)">📋 Structured</button>
+    <button class="chip" onclick="setMF('bullet',this)">• Bullets</button>
+    <button class="chip" onclick="setMF('minutes',this)">📄 Formal Minutes</button>
+    <button class="chip" onclick="setMF('actions',this)">✅ Action Items Only</button>
+  </div>
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#00c9a7;color:#000;margin-top:14px" onclick="genNotes()">🗒 Generate Notes</button>
+  <div id="notesOut-wrap" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="label" style="margin:0">Result</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyText(document.getElementById('notesOut').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput('notesOut','meeting-notes.txt')">⬇</button>
+      </div>
+    </div>
+    <div class="output-box" id="notesOut" style="min-height:160px"></div>
+  </div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let mFmt='structured';
+function setMF(f,el){mFmt=f;document.querySelectorAll('#mFChips .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+async function genNotes(){
+  const t=document.getElementById('transcript').value.trim();
+  if(!t){showToast('⚠ Paste a transcript first','warn');return;}
+  const title=document.getElementById('mTitle').value.trim()||'Meeting';
+  const btn=document.getElementById('runBtn');startTimer();showSkeleton(document.getElementById('notesOut'));setLoading(btn,true,'🗒 Generate Notes',true);
+  const fmts={structured:'Create structured notes: 1)Summary(2-3 sentences) 2)Key Discussion Points 3)Decisions Made 4)Action Items(owner & deadline if mentioned) 5)Next Steps.',bullet:'Clean bullet points: Key Points, Decisions, Action Items.',minutes:'Formal minutes: Header, Objective, Discussion, Decisions, Action Items with owners.',actions:'ONLY action items. Format: [ ] Action | Owner | Deadline(or TBD)'};
+  const ctx={standup:'Focus: Done/Doing/Blockers.',planning:'Focus: Sprint goals, assignments.',review:'Focus: Demo, feedback.',retrospective:'Focus: Went well, improve, actions.','1on1':'Focus: Career, feedback, goals.',client:'Focus: Requirements, deliverables, timelines.',brainstorm:'Focus: Ideas, priorities, next steps.',general:''};
+  try{const res=await callClaude('Professional meeting note-taker. '+fmts[mFmt]+' '+ctx[document.getElementById('mType').value],'Meeting: '+title+'\n\nTranscript:\n'+t);
+    showOutput(document.getElementById('notesOut'),res);document.getElementById('notesOut-wrap').style.display='block';
+    document.getElementById('notesOut-wrap').scrollIntoView({behavior:'smooth'});showToast('Notes ready in '+getElapsed(),'ok');}
+  catch(e){showOutput(document.getElementById('notesOut'),'Error: '+e.message,true);document.getElementById('notesOut-wrap').style.display='block';}
+  setLoading(btn,false,'🗒 Generate Notes');
+}
+</script>
+</body></html>

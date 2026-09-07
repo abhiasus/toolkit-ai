@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code Explainer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.code-input{font-family:'Fira Code','Courier New',monospace!important;font-size:13px!important;background:#050508!important;color:#c9d1d9!important;border-color:#1e1e2e!important;min-height:200px;tab-size:2}
+.explain-level-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0}
+</style>
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#c77dff22">💻</div>
+    <h1 class="tool-title" style="color:#c77dff">Code Explainer</h1>
+    <p class="tool-desc">Paste any code and get a clear plain-English explanation — what it does, how it works, and key concepts used.</p>
+  </div>
+
+  <div class="tool-card">
+    <div class="row row-2">
+      <div>
+        <div class="label">Language (optional)</div>
+        <input type="text" id="lang" placeholder="Python, JS, SQL, Java...">
+      </div>
+      <div>
+        <div class="label">Explanation level</div>
+        <select id="level">
+          <option value="beginner">Beginner — no jargon</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="expert">Expert — deep dive</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="label">What do you want to know?</div>
+    <div class="chips explain-level-wrap">
+      <button class="chip active" onclick="setMode('explain',this)">💡 Explain</button>
+      <button class="chip" onclick="setMode('bugs',this)">🐛 Find Bugs</button>
+      <button class="chip" onclick="setMode('optimize',this)">⚡ Optimize</button>
+      <button class="chip" onclick="setMode('document',this)">📝 Add Comments</button>
+    </div>
+
+    <div class="label">Your code</div>
+    <textarea class="code-input" id="codeText" placeholder="# Paste your code here
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)"></textarea>
+
+    <button class="btn btn-full" id="runBtn" style="background:#c77dff;color:#000;margin-top:16px" onclick="runExplain()">
+      💻 Explain Code
+    </button>
+
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Explanation</span>
+        <button class="copy-btn" onclick="copyOutput()" style="float:none">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'code-explanation.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output" style="max-height:500px">
+        <span class="output-placeholder">Paste your code above and click Explain. Works with any programming language.</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let mode = 'explain';
+function setMode(m, el) {
+  mode = m;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('runBtn').textContent = {
+    explain: '💻 Explain Code', bugs: '🐛 Find Bugs', optimize: '⚡ Optimize Code', document: '📝 Add Comments'
+  }[m];
+}
+
+async function runExplain() {
+  const code = document.getElementById('codeText').value.trim();
+  if (!code) { showToast('⚠ Please paste some code first.','warn'); return; }
+  const lang = document.getElementById('lang').value.trim() || 'auto-detected';
+  const level = document.getElementById('level').value;
+  const btn = document.getElementById('runBtn');
+  const btnText = btn.textContent;
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, btnText);
+
+  const systems = {
+    explain: `You are a coding teacher. Explain code for a ${level} developer. Cover: 1) What this code does (overall purpose), 2) How it works step by step, 3) Key concepts/patterns used, 4) Example of what it outputs/does. Use plain English. ${level === 'beginner' ? 'Avoid jargon. Use simple analogies.' : ''}`,
+    bugs: `You are a senior code reviewer. Analyze for bugs, errors, edge cases, and security issues. For each issue: location, what's wrong, why it's a problem, and the fix. Also note what the code does correctly.`,
+    optimize: `You are a performance engineer. Analyze this code for optimization opportunities. Cover: time complexity, space complexity, redundancies, better algorithms/patterns, and provide optimized version with explanation of improvements.`,
+    document: `You are a technical writer. Add clear, helpful inline comments to the code. Then return the fully commented version. Also add a docstring/function header if applicable. Output the commented code only.`
+  };
+
+  try {
+    const result = await callClaude(systems[mode], `Language: ${lang}\n\n${code}`);
+    showOutput(document.getElementById('output'), result);
+  } catch (e) {
+    showOutput(document.getElementById('output'), 'Error: ' + e.message, true);
+  }
+  setLoading(btn, false, btnText);
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
+    const b = document.querySelector('.copy-btn');
+    b.textContent = '✓ Copied!'; setTimeout(() => b.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Email Writer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#c77dff22">📧</div>
+    <h1 class="tool-title" style="color:#c77dff">Email Writer</h1>
+    <p class="tool-desc">Write professional emails for any situation — follow-ups, requests, apologies, complaints, introductions and more.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Email type</div>
+    <div class="chips" id="typeChips">
+      <button class="chip active" onclick="setType('followup',this)">📬 Follow-up</button>
+      <button class="chip" onclick="setType('request',this)">🙏 Request</button>
+      <button class="chip" onclick="setType('apology',this)">😔 Apology</button>
+      <button class="chip" onclick="setType('complaint',this)">⚠ Complaint</button>
+      <button class="chip" onclick="setType('intro',this)">👋 Introduction</button>
+      <button class="chip" onclick="setType('thankyou',this)">🙌 Thank You</button>
+      <button class="chip" onclick="setType('decline',this)">🚫 Decline</button>
+      <button class="chip" onclick="setType('custom',this)">✏ Custom</button>
+    </div>
+    <div class="row row-2">
+      <div>
+        <div class="label">Recipient (name / role)</div>
+        <input type="text" id="recipient" placeholder="Mr. Kumar / HR Manager / Team">
+      </div>
+      <div>
+        <div class="label">Your name</div>
+        <input type="text" id="senderName" placeholder="Your name">
+      </div>
+    </div>
+    <div class="label">Context / key points to include</div>
+    <textarea id="context" style="min-height:120px" placeholder="What's this email about? Key facts, dates, details, what you want the reader to do..."></textarea>
+    <div class="row row-2" style="margin-top:0">
+      <div>
+        <div class="label">Tone</div>
+        <select id="emailTone">
+          <option value="professional">Professional</option>
+          <option value="friendly">Friendly</option>
+          <option value="formal">Formal</option>
+          <option value="urgent">Urgent</option>
+          <option value="apologetic">Apologetic</option>
+        </select>
+      </div>
+      <div>
+        <div class="label">Length</div>
+        <select id="emailLen">
+          <option value="short">Short (3-4 lines)</option>
+          <option value="medium" selected>Medium (standard)</option>
+          <option value="detailed">Detailed (comprehensive)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-full" id="runBtn" style="background:#c77dff;color:#000;margin-top:14px" onclick="runEmail()">📧 Write Email</button>
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Your Email</span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('output').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'email.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output" style="min-height:200px"><span class="output-placeholder">Your email will appear here. Fill in the fields above and click Write Email.</span></div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let emailType = 'followup';
+const typeDescriptions = {
+  followup: 'a professional follow-up email',
+  request: 'a polite request email',
+  apology: 'a sincere apology email',
+  complaint: 'a firm but professional complaint email',
+  intro: 'a warm introduction email',
+  thankyou: 'a genuine thank-you email',
+  decline: 'a polite but firm email declining an offer or request',
+  custom: 'an email'
+};
+function setType(t, el) {
+  emailType = t;
+  document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+async function runEmail() {
+  const context = document.getElementById('context').value.trim();
+  if (!context) { showToast('⚠ Please describe what the email is about.','warn'); return; }
+  const recipient = document.getElementById('recipient').value.trim() || 'the recipient';
+  const sender = document.getElementById('senderName').value.trim() || 'the sender';
+  const tone = document.getElementById('emailTone').value;
+  const len = document.getElementById('emailLen').value;
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '📧 Write Email');
+
+  const sys = `You are an expert email writer. Write ${typeDescriptions[emailType]}.
+Tone: ${tone}. Length: ${len}.
+Rules: Clear subject line, natural opening, direct content, clear call-to-action if needed, professional sign-off.
+Output the complete email including Subject: line, greeting, body, and sign-off. No extra commentary.`;
+
+  const prompt = `Write to: ${recipient}\nFrom: ${sender}\nContext: ${context}`;
+  try {
+    const result = await callClaude(sys, prompt);
+    showOutput(document.getElementById('output'), result);
+  } catch(e) { showOutput(document.getElementById('output'), 'Error: ' + e.message, true); }
+  setLoading(btn, false, '📧 Write Email');
+}
+</script>
+</body>
+</html>

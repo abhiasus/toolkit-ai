@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grammar Checker — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#6bcb7722">✅</div>
+    <h1 class="tool-title" style="color:#6bcb77">Grammar Checker</h1>
+    <p class="tool-desc">Fix grammar, spelling, punctuation and style issues. See exactly what changed with diff highlighting.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Check style</div>
+    <div class="chips" id="styleChips">
+      <button class="chip active" onclick="setStyle('standard',this)">Standard</button>
+      <button class="chip" onclick="setStyle('formal',this)">Formal</button>
+      <button class="chip" onclick="setStyle('casual',this)">Casual</button>
+      <button class="chip" onclick="setStyle('business',this)">Business</button>
+    </div>
+    <div class="label">Your text</div>
+    <textarea id="grammarText" style="min-height:180px" placeholder="Paste your text here — emails, essays, messages, reports..."></textarea>
+    <button class="btn btn-full" id="runBtn" style="background:#6bcb77;color:#000;margin-top:14px" onclick="runGrammar()">✅ Check Grammar</button>
+
+    <div id="resultsSection" style="display:none;margin-top:24px">
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div id="errorCount" style="padding:10px 16px;background:#1f0a0a;border:1px solid #ff6b6b33;border-radius:10px;font-size:13px;color:#ff9090"></div>
+        <div id="scoreBox" style="padding:10px 16px;background:#0a1f0d;border:1px solid #6bcb7733;border-radius:10px;font-size:13px;color:#6bcb77"></div>
+      </div>
+      <div class="label">Fixed text</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;margin-top:8px">
+        <span style="font-size:12px;color:var(--muted)">
+          <span style="background:#0a2e0a;color:#6bcb77;padding:1px 5px;border-radius:3px">green = added</span>
+          &nbsp;
+          <span style="background:#2e0a0a;color:#ff9090;padding:1px 5px;border-radius:3px;text-decoration:line-through">red = removed</span>
+        </span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('fixedText').innerText, this)">Copy Fixed</button>
+        <button class="dl-btn" onclick="downloadOutput(\'diffView\',\'fixed-text.txt\')">⬇</button>
+      </div>
+      <div class="grammar-diff" id="diffView"></div>
+      <div class="label" style="margin-top:20px">Issues found</div>
+      <div class="output-box" id="issuesList" style="min-height:80px"></div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let grammarStyle = 'standard';
+function setStyle(s, el) {
+  grammarStyle = s;
+  document.querySelectorAll('#styleChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function runGrammar() {
+  const text = document.getElementById('grammarText').value.trim();
+  if (!text) { showToast('⚠ Please paste some text first.','warn'); return; }
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('diffView'));
+  setLoading(btn, true, '✅ Check Grammar');
+
+  const sys = `You are an expert grammar checker. Fix all grammar, spelling, punctuation, and ${grammarStyle} style issues in the given text.
+
+Respond ONLY with valid JSON (no markdown, no backticks):
+{
+  "fixed": "the fully corrected text here",
+  "score": 85,
+  "error_count": 3,
+  "issues": [
+    {"type": "Grammar", "original": "I has", "fixed": "I have", "explanation": "Subject-verb agreement"},
+    {"type": "Spelling", "original": "recieve", "fixed": "receive", "explanation": "Common misspelling"}
+  ]
+}
+
+score: 0-100 (100 = perfect). Be thorough but don't change style or meaning unnecessarily.`;
+
+  try {
+    const raw = await callClaude(sys, text);
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const data = JSON.parse(clean);
+    
+    document.getElementById('resultsSection').style.display = 'block';
+    document.getElementById('errorCount').textContent = `⚠ ${data.error_count || data.issues?.length || 0} issues found`;
+    document.getElementById('scoreBox').textContent = `✓ Writing score: ${data.score}/100`;
+    
+    // Diff view
+    const diffEl = document.getElementById('diffView');
+    diffEl.id = 'diffView';
+    diffEl.innerHTML = '';
+    // simple word diff
+    const origWords = text.split(/(\s+)/);
+    const fixedWords = (data.fixed || text).split(/(\s+)/);
+    let diffHTML = '';
+    const maxLen = Math.max(origWords.length, fixedWords.length);
+    for (let i = 0; i < fixedWords.length; i++) {
+      const fw = fixedWords[i];
+      const ow = origWords[i] || '';
+      if (!fw.trim()) { diffHTML += fw; continue; }
+      if (fw === ow) diffHTML += escHtml(fw);
+      else {
+        if (ow && ow.trim()) diffHTML += `<del>${escHtml(ow)}</del>`;
+        diffHTML += `<ins>${escHtml(fw)}</ins>`;
+      }
+    }
+    diffEl.innerHTML = diffHTML || escHtml(data.fixed || text);
+    diffEl.setAttribute('id','diffView');
+    // hidden fixed text for copying
+    let fixedDiv = document.getElementById('fixedText');
+    if (!fixedDiv) { fixedDiv = document.createElement('div'); fixedDiv.id='fixedText'; fixedDiv.style.display='none'; document.body.appendChild(fixedDiv); }
+    fixedDiv.textContent = data.fixed || text;
+
+    // Issues list
+    const issuesHTML = (data.issues||[]).map(i =>
+      `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="background:#1a1a2e;color:#4d96ff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;margin-right:8px">${i.type||'Issue'}</span>
+        <del style="color:#ff9090">${escHtml(i.original||'')}</del>
+        → <ins style="color:#6bcb77;text-decoration:none">${escHtml(i.fixed||'')}</ins>
+        <span style="color:var(--muted);margin-left:8px;font-size:12px">${escHtml(i.explanation||'')}</span>
+      </div>`
+    ).join('') || '<span class="output-placeholder">No issues found — your text looks great!</span>';
+    showOutput(document.getElementById('issuesList'), '');
+    document.getElementById('issuesList').innerHTML = issuesHTML;
+    document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+  } catch(e) {
+    showToast('✗ '+e.message,'err');
+  }
+  setLoading(btn, false, '✅ Check Grammar');
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>

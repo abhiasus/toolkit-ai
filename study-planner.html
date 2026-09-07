@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Planner — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#c77dff22">📚</div>
+    <h1 class="tool-title" style="color:#c77dff">Study Planner</h1>
+    <p class="tool-desc">Create personalized study schedules and exam prep plans with day-by-day breakdowns.</p>
+  </div>
+  <div class="tool-card">
+  <div class="row row-2">
+    <div><div class="label">Subject / Exam</div><input type="text" id="spSub" placeholder="BCA Sem 5, AWS Cloud, IELTS..."></div>
+    <div><div class="label">Days until exam</div><input type="number" id="spDays" value="30" min="1" max="365"></div>
+  </div>
+  <div class="row row-2" style="margin-top:0">
+    <div><div class="label">Hours/day</div><select id="spHrs"><option>1 hour</option><option>2 hours</option><option selected>3 hours</option><option>4 hours</option><option>5 hours</option><option>6+ hours</option></select></div>
+    <div><div class="label">Level</div><select id="spLvl"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option></select></div>
+  </div>
+  <div class="label">Topics (optional)</div>
+  <textarea id="spTopics" style="min-height:80px" placeholder="1. Chapter 1 — Limits&#10;2. Chapter 2 — Derivatives&#10;3. Chapter 3 — Integrals"></textarea>
+  <div class="label">Preferences</div>
+  <div class="chips" id="spPC">
+    <button class="chip active" onclick="togSP(this)">Mix of topics</button><button class="chip" onclick="togSP(this)">Practice tests</button><button class="chip" onclick="togSP(this)">Flashcards</button><button class="chip" onclick="togSP(this)">Video lessons</button><button class="chip" onclick="togSP(this)">Reading</button>
+  </div>
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#c77dff;color:#000;margin-top:14px" onclick="genPlan()">📚 Generate Plan</button>
+  <div id="planOut-wrap" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="label" style="margin:0">Result</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyText(document.getElementById('planOut').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput('planOut','study-plan.txt')">⬇</button>
+      </div>
+    </div>
+    <div class="output-box" id="planOut" style="min-height:160px"></div>
+  </div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let spPrefs=['Mix of topics'];
+function togSP(el){el.classList.toggle('active');spPrefs=Array.from(document.querySelectorAll('#spPC .chip.active')).map(c=>c.textContent.trim());if(!spPrefs.length){el.classList.add('active');spPrefs=[el.textContent.trim()];}}
+async function genPlan(){
+  const sub=document.getElementById('spSub').value.trim();
+  if(!sub){showToast('⚠ Enter a subject or exam','warn');return;}
+  const btn=document.getElementById('runBtn');startTimer();showSkeleton(document.getElementById('planOut'));setLoading(btn,true,'📚 Generate Plan',true);
+  try{
+    const res=await callClaude('Expert educational planner. Detailed study plan: day-by-day schedule with topics and time, study techniques(Pomodoro/active recall/spaced repetition), practice test days, resources, weekly checkpoints, final 3-day review strategy.',
+      'Subject: '+sub+'\nDays: '+document.getElementById('spDays').value+'\nHours/day: '+document.getElementById('spHrs').value+'\nLevel: '+document.getElementById('spLvl').value+'\nTopics: '+(document.getElementById('spTopics').value||'All relevant topics')+'\nPreferences: '+spPrefs.join(', '));
+    showOutput(document.getElementById('planOut'),res);document.getElementById('planOut-wrap').style.display='block';
+    document.getElementById('planOut-wrap').scrollIntoView({behavior:'smooth'});showToast('Plan ready in '+getElapsed(),'ok');}
+  catch(e){showOutput(document.getElementById('planOut'),'Error: '+e.message,true);document.getElementById('planOut-wrap').style.display='block';}
+  setLoading(btn,false,'📚 Generate Plan');
+}
+</script>
+</body></html>

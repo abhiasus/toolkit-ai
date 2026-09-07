@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Translator — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#06d6a022">🌐</div>
+    <h1 class="tool-title" style="color:#06d6a0">Translator</h1>
+    <p class="tool-desc">Translate between 30+ languages. Preserves tone, idioms, and natural phrasing.</p>
+  </div>
+  <div class="tool-card">
+    <div class="lang-grid">
+      <div>
+        <div class="label">From</div>
+        <select id="fromLang">
+          <option value="auto">🔍 Auto-detect</option>
+          <option value="English">🇺🇸 English</option>
+          <option value="Hindi">🇮🇳 Hindi</option>
+          <option value="Spanish">🇪🇸 Spanish</option>
+          <option value="French">🇫🇷 French</option>
+          <option value="German">🇩🇪 German</option>
+          <option value="Chinese (Simplified)">🇨🇳 Chinese</option>
+          <option value="Japanese">🇯🇵 Japanese</option>
+          <option value="Korean">🇰🇷 Korean</option>
+          <option value="Arabic">🇸🇦 Arabic</option>
+          <option value="Portuguese">🇧🇷 Portuguese</option>
+          <option value="Russian">🇷🇺 Russian</option>
+          <option value="Italian">🇮🇹 Italian</option>
+          <option value="Dutch">🇳🇱 Dutch</option>
+          <option value="Turkish">🇹🇷 Turkish</option>
+          <option value="Kannada">🇮🇳 Kannada</option>
+          <option value="Tamil">🇮🇳 Tamil</option>
+          <option value="Telugu">🇮🇳 Telugu</option>
+          <option value="Bengali">🇮🇳 Bengali</option>
+          <option value="Marathi">🇮🇳 Marathi</option>
+          <option value="Gujarati">🇮🇳 Gujarati</option>
+          <option value="Malayalam">🇮🇳 Malayalam</option>
+          <option value="Punjabi">🇮🇳 Punjabi</option>
+          <option value="Urdu">🇵🇰 Urdu</option>
+          <option value="Indonesian">🇮🇩 Indonesian</option>
+          <option value="Thai">🇹🇭 Thai</option>
+          <option value="Vietnamese">🇻🇳 Vietnamese</option>
+          <option value="Polish">🇵🇱 Polish</option>
+          <option value="Swedish">🇸🇪 Swedish</option>
+          <option value="Greek">🇬🇷 Greek</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end;justify-content:center">
+        <button class="swap-btn" onclick="swapLangs()" title="Swap languages">⇄</button>
+      </div>
+      <div>
+        <div class="label">To</div>
+        <select id="toLang">
+          <option value="Hindi">🇮🇳 Hindi</option>
+          <option value="English" selected>🇺🇸 English</option>
+          <option value="Spanish">🇪🇸 Spanish</option>
+          <option value="French">🇫🇷 French</option>
+          <option value="German">🇩🇪 German</option>
+          <option value="Chinese (Simplified)">🇨🇳 Chinese</option>
+          <option value="Japanese">🇯🇵 Japanese</option>
+          <option value="Korean">🇰🇷 Korean</option>
+          <option value="Arabic">🇸🇦 Arabic</option>
+          <option value="Portuguese">🇧🇷 Portuguese</option>
+          <option value="Russian">🇷🇺 Russian</option>
+          <option value="Italian">🇮🇹 Italian</option>
+          <option value="Dutch">🇳🇱 Dutch</option>
+          <option value="Turkish">🇹🇷 Turkish</option>
+          <option value="Kannada">🇮🇳 Kannada</option>
+          <option value="Tamil">🇮🇳 Tamil</option>
+          <option value="Telugu">🇮🇳 Telugu</option>
+          <option value="Bengali">🇮🇳 Bengali</option>
+          <option value="Marathi">🇮🇳 Marathi</option>
+          <option value="Gujarati">🇮🇳 Gujarati</option>
+          <option value="Malayalam">🇮🇳 Malayalam</option>
+          <option value="Punjabi">🇮🇳 Punjabi</option>
+          <option value="Urdu">🇵🇰 Urdu</option>
+          <option value="Indonesian">🇮🇩 Indonesian</option>
+          <option value="Thai">🇹🇭 Thai</option>
+          <option value="Vietnamese">🇻🇳 Vietnamese</option>
+          <option value="Polish">🇵🇱 Polish</option>
+          <option value="Swedish">🇸🇪 Swedish</option>
+          <option value="Greek">🇬🇷 Greek</option>
+        </select>
+      </div>
+    </div>
+    <div class="label">Text to translate</div>
+    <textarea id="srcText" placeholder="Type or paste your text here..." style="min-height:160px"></textarea>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-full" id="runBtn" style="background:#06d6a0;color:#000" onclick="runTranslate()">🌐 Translate</button>
+    </div>
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Translation</span>
+        <button class="copy-btn" onclick="copyText(document.getElementById('output').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'translation.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output" style="min-height:120px"><span class="output-placeholder">Translation will appear here.</span></div>
+    </div>
+  </div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+function swapLangs() {
+  const f = document.getElementById('fromLang');
+  const t = document.getElementById('toLang');
+  const fv = f.value === 'auto' ? 'English' : f.value;
+  const tv = t.value;
+  // swap text too
+  const src = document.getElementById('srcText').value;
+  const out = document.getElementById('output').innerText;
+  if (out && out !== 'Translation will appear here.') {
+    document.getElementById('srcText').value = out;
+  }
+  f.value = tv; t.value = fv;
+}
+async function runTranslate() {
+  const text = document.getElementById('srcText').value.trim();
+  if (!text) { showToast('⚠ Please enter text to translate.','warn'); return; }
+  const from = document.getElementById('fromLang').value;
+  const to   = document.getElementById('toLang').value;
+  const btn  = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '🌐 Translate');
+  const sys = `You are a professional translator. Translate the given text ${from !== 'auto' ? 'from ' + from : ''} to ${to}. Preserve tone, style, idioms naturally. Output ONLY the translation, nothing else.`;
+  try {
+    const result = await callClaude(sys, text);
+    showOutput(document.getElementById('output'), result);
+  } catch(e) { showOutput(document.getElementById('output'), 'Error: ' + e.message, true); }
+  setLoading(btn, false, '🌐 Translate');
+}
+</script>
+</body>
+</html>

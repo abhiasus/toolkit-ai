@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Media Writer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#1da1f222">📱</div>
+    <h1 class="tool-title" style="color:#1da1f2">Social Media Writer</h1>
+    <p class="tool-desc">Generate posts for Twitter/X, LinkedIn, Instagram, Facebook, Threads, and TikTok.</p>
+  </div>
+  <div class="tool-card">
+  <div class="label">Platform</div>
+  <div class="chips" id="platC">
+    <button class="chip active" onclick="setPlat('twitter',this)">🐦 Twitter/X</button>
+    <button class="chip" onclick="setPlat('linkedin',this)">💼 LinkedIn</button>
+    <button class="chip" onclick="setPlat('instagram',this)">📸 Instagram</button>
+    <button class="chip" onclick="setPlat('facebook',this)">👥 Facebook</button>
+    <button class="chip" onclick="setPlat('threads',this)">🧵 Threads</button>
+    <button class="chip" onclick="setPlat('tiktok',this)">🎵 TikTok</button>
+  </div>
+  <div class="row row-2">
+    <div><div class="label">Topic</div><input type="text" id="sTopic" placeholder="Launching my new AI project..."></div>
+    <div><div class="label">Tone</div><select id="sTone"><option value="casual" selected>Casual</option><option value="professional">Professional</option><option value="witty">Witty</option><option value="inspirational">Inspirational</option><option value="educational">Educational</option></select></div>
+  </div>
+  <div class="label">Context (optional)</div>
+  <textarea id="sCtx" style="min-height:70px" placeholder="Key points, audience, CTA..."></textarea>
+  <div class="label">Variations</div>
+  <div class="chips" id="sVarC"><button class="chip active" onclick="setSV(1,this)">1</button><button class="chip" onclick="setSV(3,this)">3</button><button class="chip" onclick="setSV(5,this)">5</button></div>
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#1da1f2;color:#000;margin-top:14px" onclick="genPosts()">📱 Generate Posts</button>
+  <div id="postsOut" style="display:none;margin-top:14px"></div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let sPlat='twitter',sVars=1;
+function setPlat(p,el){sPlat=p;document.querySelectorAll('#platC .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+function setSV(n,el){sVars=n;document.querySelectorAll('#sVarC .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+async function genPosts(){
+  const topic=document.getElementById('sTopic').value.trim();
+  if(!topic){showToast('⚠ Enter a topic','warn');return;}
+  const btn=document.getElementById('runBtn');startTimer();setLoading(btn,true,'📱 Generate Posts',true);
+  const rules={twitter:'Max 280 chars. Punchy, hook-first, 2-3 hashtags.',linkedin:'100-200 words. Storytelling. 3-5 hashtags. Question at end.',instagram:'Visual caption. Emojis. CTA. 5-10 hashtags at end.',facebook:'Community-focused. 2-3 paragraphs. 2-4 hashtags.',threads:'Short, casual. Minimal hashtags.',tiktok:'Energetic. Max 150 chars. 3-5 trending hashtags.'};
+  try{
+    const res=await callClaude('Social media expert. Generate '+sVars+' '+sPlat+' post(s). '+rules[sPlat]+' Tone: '+document.getElementById('sTone').value+'. Number posts as "Post 1:", "Post 2:", etc.','Topic: '+topic+(document.getElementById('sCtx').value.trim()?'\nContext: '+document.getElementById('sCtx').value.trim():''));
+    const sec=document.getElementById('postsOut');sec.style.display='block';sec.innerHTML='';
+    const parts=res.split(/(?=Post \d+:)/i).filter(p=>p.trim());
+    (parts.length>1?parts:[res]).forEach(post=>{
+      const clean=post.replace(/^Post \d+:\s*/i,'').trim();
+      const div=document.createElement('div');div.className='tool-card';div.style.marginBottom='10px';
+      div.innerHTML=`<div style="font-size:14px;line-height:1.65;color:#ccc;white-space:pre-wrap;margin-bottom:10px">${escHtml(clean).replace(/#(\w+)/g,'<span style="color:#4d96ff">#$1</span>')}</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;color:var(--muted)">${clean.length} chars · ${sPlat}</span><button class="copy-btn" onclick="navigator.clipboard.writeText(this.closest('.tool-card').querySelector('div').innerText).then(()=>showToast('✓ Copied!','ok'))">Copy</button></div>`;
+      sec.appendChild(div);
+    });
+    sec.scrollIntoView({behavior:'smooth'});showToast('Done in '+getElapsed(),'ok');
+  }catch(e){document.getElementById('postsOut').style.display='block';document.getElementById('postsOut').innerHTML=`<div class="tool-card"><div class="output-box" style="color:#ff6b6b">Error: ${escHtml(e.message)}</div></div>`;}
+  setLoading(btn,false,'📱 Generate Posts');
+}
+</script>
+</body></html>

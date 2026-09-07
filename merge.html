@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Doc Merger — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+.slot{background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-bottom:10px}
+.slot-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slot-num{width:26px;height:26px;border-radius:50%;background:#4d96ff22;color:#4d96ff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sdrop{border:2px dashed var(--border2);border-radius:8px;padding:14px;text-align:center;cursor:pointer;position:relative;transition:all .2s;font-size:13px;color:var(--muted)}
+.sdrop:hover,.sdrop.dragover{border-color:#4d96ff;color:#4d96ff;background:#4d96ff08}
+.sdrop.has-file{border-color:#6bcb7744;border-style:solid}
+.sdrop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.add-btn{width:100%;padding:12px;border:2px dashed var(--border2);border-radius:10px;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s}
+.add-btn:hover{border-color:#4d96ff;color:#4d96ff;background:#4d96ff08}
+.thumb-strip{display:flex;gap:6px;flex-wrap:wrap;padding:10px;background:var(--bg3);border-radius:8px;min-height:50px;align-items:flex-start}
+.thumb{cursor:pointer;text-align:center;user-select:none}
+.thumb canvas{border-radius:4px;border:2px solid transparent;display:block;transition:border-color .15s}
+.thumb:hover canvas{border-color:#4d96ff}
+.thumb.excl canvas{opacity:.2;border-color:#ff6b6b33}
+.thumb.excl::after{content:"✕";display:block;text-align:center;color:#ff6b6b;font-size:12px;font-weight:700;margin-top:2px}
+.thumb-n{font-size:9px;color:var(--muted);text-align:center;margin-top:2px}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.mc{padding:14px;border-radius:12px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;transition:all .18s}
+.mc:hover{border-color:var(--border3)}
+.mc.active{border-color:#4d96ff;background:#001833}
+.mc-title{font-size:13px;font-weight:600;color:#4d96ff;margin-bottom:3px}
+.mc-desc{font-size:11px;color:var(--muted);line-height:1.4}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page" style="max-width:900px">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#4d96ff22">🔗</div>
+    <h1 class="tool-title" style="color:#4d96ff">Doc Merger & Page Editor</h1>
+    <p class="tool-desc">Merge PDFs with custom page ranges. Or remove/replace specific pages. Downloads as PDF.</p>
+  </div>
+  <div class="tool-card">
+    <div class="label">Mode</div>
+    <div class="mode-grid">
+      <div class="mc active" id="mc-merge" onclick="setMode('merge',this)"><div class="mc-title">🔗 Merge Documents</div><div class="mc-desc">Combine pages from 2+ PDFs. Set exact page range from each.</div></div>
+      <div class="mc" id="mc-edit" onclick="setMode('edit',this)"><div class="mc-title">✂️ Remove / Replace Pages</div><div class="mc-desc">Click thumbnails to exclude pages. Insert replacement PDF anywhere.</div></div>
+    </div>
+    <div id="sec-merge">
+      <div class="label">Documents (up to 10)</div>
+      <div id="docList"></div>
+      <button class="add-btn" onclick="addSlot()">➕ Add Another PDF</button>
+      <div class="tip-box" style="margin-top:10px">💡 <b>Page range:</b> blank = all · "1-4" = pages 1 to 4 · "2,5,8" = specific pages</div>
+    </div>
+    <div id="sec-edit" style="display:none">
+      <div class="label">Upload your PDF</div>
+      <div class="sdrop" id="editDrop">
+        <input type="file" id="editFile" accept=".pdf" onchange="loadEdit(this.files[0])">
+        <div id="editLbl"><div style="font-size:28px;margin-bottom:6px">📄</div><div style="font-weight:600;color:#ccc">Drop PDF here or click</div><div style="font-size:12px;color:#6bcb77;margin-top:4px">✓ Click page thumbnails to exclude them</div></div>
+      </div>
+      <div id="editPreview" style="display:none;margin-top:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="label" style="margin:0">Click to exclude <span style="color:#ff6b6b;font-size:11px">(red = removed)</span></div>
+          <div style="display:flex;gap:6px"><button class="copy-btn" onclick="eAll()">All</button><button class="copy-btn" onclick="eNone()">None</button></div>
+        </div>
+        <div class="thumb-strip" id="editStrip"></div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted)">Keeping: <span id="kCount" style="color:#4d96ff;font-weight:700">0</span> · Removing: <span id="rCount" style="color:#ff6b6b;font-weight:700">0</span></div>
+      </div>
+      <div id="insSec" style="display:none;margin-top:14px">
+        <div class="label">Insert replacement PDF (optional)</div>
+        <div class="sdrop" id="insDrop">
+          <input type="file" id="insFile" accept=".pdf" onchange="loadIns(this.files[0])">
+          <div id="insLbl"><div style="font-size:22px;margin-bottom:4px">📎</div><div style="font-size:13px;color:#ccc;font-weight:600">Drop replacement PDF here</div></div>
+        </div>
+        <div id="insOpts" style="display:none;margin-top:10px">
+          <div class="row row-2" style="margin-top:0">
+            <div><div class="label">Pages from replacement</div><input type="text" id="insRange" placeholder="all  or  1-3"></div>
+            <div><div class="label">Insert after page #</div><input type="number" id="insAfter" placeholder="0 = beginning" min="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="label" style="margin-top:16px">Output filename</div>
+    <input type="text" id="outName" placeholder="merged-document">
+    <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#4d96ff;color:#000;margin-top:14px" onclick="runMerge()">🔗 Merge & Download PDF</button>
+    <div id="mProg" style="display:none;margin-top:10px"><div class="progress-bar"><div class="progress-fill" id="mFill" style="background:#4d96ff;width:0%"></div></div><div class="progress-label" id="mLbl"></div></div>
+  </div>
+  <div id="mergeResult" style="display:none" class="tool-card"><div class="tip-box" id="mergeResultTxt">✓ Done!</div></div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let mMode='merge',slots=[],sId=0,editDoc=null,editN=0,excl=new Set(),insDoc=null;
+
+function setMode(m,el){mMode=m;document.querySelectorAll('.mc').forEach(c=>c.classList.remove('active'));el.classList.add('active');document.getElementById('sec-merge').style.display=m==='merge'?'block':'none';document.getElementById('sec-edit').style.display=m==='edit'?'block':'none';document.getElementById('runBtn').textContent=m==='merge'?'🔗 Merge & Download PDF':'✂️ Apply & Download PDF';}
+
+function addSlot(){
+  if(slots.length>=10){showToast('⚠ Max 10 docs','warn');return;}
+  const id=++sId;slots.push({id,pdf:null,n:0,range:'',name:''});renderSlots();
+}
+function remSlot(id){slots=slots.filter(s=>s.id!==id);renderSlots();}
+function mvSlot(id,d){const i=slots.findIndex(s=>s.id===id),j=i+d;if(j<0||j>=slots.length)return;[slots[i],slots[j]]=[slots[j],slots[i]];renderSlots();}
+function renderSlots(){
+  const list=document.getElementById('docList');list.innerHTML='';
+  slots.forEach((slot,i)=>{
+    const div=document.createElement('div');div.className='slot';
+    div.innerHTML=`<div class="slot-hd"><div class="slot-num">${i+1}</div><div style="flex:1;font-size:13px;font-weight:600;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(slot.name||'No file')}</div>${slot.n?`<span style="background:#4d96ff22;color:#4d96ff;font-size:11px;padding:2px 8px;border-radius:4px">${slot.n}p</span>`:''}<div style="display:flex;flex-direction:column;gap:2px">${i>0?`<button onclick="mvSlot(${slot.id},-1)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--muted);font-size:10px;cursor:pointer;padding:1px 5px">▲</button>`:''}</div>${i<slots.length-1?`<button onclick="mvSlot(${slot.id},1)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--muted);font-size:10px;cursor:pointer;padding:1px 5px">▼</button>`:''} <button onclick="remSlot(${slot.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0">✕</button></div><div class="sdrop ${slot.pdf?'has-file':''}" style="position:relative"><input type="file" accept=".pdf" onchange="hSlot(${slot.id},this.files[0])" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">${slot.pdf?`<div style="color:#6bcb77;font-size:13px">✅ ${escHtml(slot.name)} — click to change</div>`:'<div>📄 Drop PDF or click to browse</div>'}</div>${slot.n?`<div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--muted)">Pages:</span><input type="text" value="${escHtml(slot.range)}" placeholder="all" onchange="slots.find(s=>s.id==${slot.id}).range=this.value.trim()" style="width:120px;padding:5px 8px;font-size:12px"><span style="font-size:11px;color:var(--muted2)">blank=all ${slot.n}p · 1-4 · 2,5,8</span></div>`:''}`;
+    list.appendChild(div);
+  });
+}
+
+async function hSlot(id,file){
+  if(!file)return;const slot=slots.find(s=>s.id===id);if(!slot)return;
+  slot.name=file.name;
+  try{const ab=await file.arrayBuffer();slot.pdf=await pdfjsLib.getDocument({data:new Uint8Array(ab)}).promise;slot.n=slot.pdf.numPages;showToast('✓ '+file.name+' ('+slot.n+'p)','ok');}
+  catch(e){showToast('✗ '+e.message,'err');}
+  renderSlots();
+}
+
+function parseRng(str,max){
+  if(!str||!str.trim())return Array.from({length:max},(_,i)=>i+1);
+  const s=new Set();str.split(',').forEach(p=>{const t=p.trim();if(t.includes('-')){const[a,b]=t.split('-').map(Number);for(let i=Math.max(1,a);i<=Math.min(max,b);i++)s.add(i);}else{const n=parseInt(t);if(n>=1&&n<=max)s.add(n);}});return[...s].sort((a,b)=>a-b);
+}
+
+const eDz=document.getElementById('editDrop');
+eDz.addEventListener('dragover',e=>{e.preventDefault();eDz.classList.add('dragover');});
+eDz.addEventListener('dragleave',()=>eDz.classList.remove('dragover'));
+eDz.addEventListener('drop',e=>{e.preventDefault();eDz.classList.remove('dragover');if(e.dataTransfer.files[0])loadEdit(e.dataTransfer.files[0]);});
+const iDz=document.getElementById('insDrop');
+iDz.addEventListener('dragover',e=>{e.preventDefault();iDz.classList.add('dragover');});
+iDz.addEventListener('dragleave',()=>iDz.classList.remove('dragover'));
+iDz.addEventListener('drop',e=>{e.preventDefault();iDz.classList.remove('dragover');if(e.dataTransfer.files[0])loadIns(e.dataTransfer.files[0]);});
+
+async function loadEdit(file){
+  document.getElementById('editLbl').innerHTML='<div style="font-size:22px;margin-bottom:4px">⏳</div><div style="color:#aaa">Loading...</div>';
+  try{
+    const ab=await file.arrayBuffer();editDoc=await pdfjsLib.getDocument({data:new Uint8Array(ab)}).promise;editN=editDoc.numPages;excl.clear();
+    document.getElementById('editLbl').innerHTML=`<div style="font-size:22px;margin-bottom:4px">✅</div><div style="color:#6bcb77;font-weight:600">${file.name}</div><div style="font-size:11px;color:#888">${editN} pages · click thumbnails to exclude</div>`;
+    eDz.classList.add('has-file');
+    await renderThumbs();
+    document.getElementById('editPreview').style.display='block';
+    document.getElementById('insSec').style.display='block';
+    updCounts();showToast('✓ '+editN+' pages loaded','ok');
+  }catch(e){showToast('✗ '+e.message,'err');}
+}
+
+async function renderThumbs(){
+  const strip=document.getElementById('editStrip');strip.innerHTML='';
+  for(let p=1;p<=editN;p++){
+    const page=await editDoc.getPage(p);
+    const vp=page.getViewport({scale:1});
+    const sc=60/vp.width;const viewport=page.getViewport({scale:sc});
+    const canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;canvas.style.cssText=`width:60px;height:${Math.round(viewport.height)}px`;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    const wrap=document.createElement('div');wrap.className='thumb';wrap.dataset.page=p;
+    wrap.appendChild(canvas);const num=document.createElement('div');num.className='thumb-n';num.textContent='p.'+p;wrap.appendChild(num);
+    wrap.addEventListener('click',()=>{if(excl.has(p)){excl.delete(p);wrap.classList.remove('excl');}else{excl.add(p);wrap.classList.add('excl');}updCounts();});
+    strip.appendChild(wrap);
+  }
+}
+function updCounts(){document.getElementById('kCount').textContent=editN-excl.size;document.getElementById('rCount').textContent=excl.size;}
+function eAll(){excl.clear();document.querySelectorAll('.thumb').forEach(w=>w.classList.remove('excl'));updCounts();}
+function eNone(){for(let p=1;p<=editN;p++)excl.add(p);document.querySelectorAll('.thumb').forEach(w=>w.classList.add('excl'));updCounts();}
+
+async function loadIns(file){
+  try{
+    const ab=await file.arrayBuffer();insDoc=await pdfjsLib.getDocument({data:new Uint8Array(ab)}).promise;
+    document.getElementById('insLbl').innerHTML=`<div style="font-size:18px;margin-bottom:4px">✅</div><div style="color:#6bcb77;font-size:13px;font-weight:600">${file.name} (${insDoc.numPages}p)</div>`;
+    iDz.classList.add('has-file');document.getElementById('insOpts').style.display='block';
+    const first=[...excl].sort((a,b)=>a-b)[0]||1;
+    document.getElementById('insAfter').value=Math.max(0,first-1);showToast('✓ Replacement loaded','ok');
+  }catch(e){showToast('✗ '+e.message,'err');}
+}
+
+async function rndPage(pdf,n){
+  const page=await pdf.getPage(n);const viewport=page.getViewport({scale:1.5});
+  const canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;
+  await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+  return{canvas,w:viewport.width,h:viewport.height};
+}
+
+async function runMerge(){
+  if(mMode==='merge'&&!slots.filter(s=>s.pdf).length){showToast('⚠ Add at least one PDF','warn');return;}
+  if(mMode==='edit'&&!editDoc){showToast('⚠ Upload a PDF first','warn');return;}
+  const btn=document.getElementById('runBtn');const fill=document.getElementById('mFill');const lbl=document.getElementById('mLbl');
+  setLoading(btn,true,btn.textContent,true);document.getElementById('mProg').style.display='block';fill.style.width='5%';startTimer();
+
+  try{
+    const{jsPDF}=window.jspdf;let toRender=[];
+    if(mMode==='merge'){
+      for(const slot of slots.filter(s=>s.pdf)){parseRng(slot.range,slot.n).forEach(p=>toRender.push({pdf:slot.pdf,p}));}
+    }else{
+      const insAfter=parseInt(document.getElementById('insAfter')?.value)||0;
+      const insRng=document.getElementById('insRange')?.value?.trim()||'';
+      let insPages=insDoc?parseRng(insRng,insDoc.numPages):[];
+      if(insAfter===0&&insDoc){insPages.forEach(p=>toRender.push({pdf:insDoc,p}));insPages=[];}
+      for(let p=1;p<=editN;p++){
+        if(!excl.has(p))toRender.push({pdf:editDoc,p});
+        if(p===insAfter&&insDoc){insPages.forEach(ip=>toRender.push({pdf:insDoc,p:ip}));insPages=[];}
+      }
+    }
+    if(!toRender.length){showToast('⚠ No pages selected!','warn');setLoading(btn,false,btn.textContent);return;}
+    lbl.textContent=`Rendering ${toRender.length} pages...`;
+    let pdf=null;
+    for(let i=0;i<toRender.length;i++){
+      fill.style.width=Math.round((i+1)/toRender.length*92)+'%';
+      lbl.textContent=`Rendering page ${i+1} of ${toRender.length}...`;
+      const{canvas,w,h}=await rndPage(toRender[i].pdf,toRender[i].p);
+      const orient=w>h?'landscape':'portrait';
+      const img=canvas.toDataURL('image/jpeg',0.88);
+      if(!pdf){pdf=new jsPDF({orientation:orient,unit:'px',format:[w,h],compress:true});}
+      else{pdf.addPage([w,h],orient);}
+      pdf.addImage(img,'JPEG',0,0,w,h);
+    }
+    fill.style.width='100%';lbl.textContent='✓ Downloading...';fill.style.background='#6bcb77';
+    const fname=(document.getElementById('outName').value.trim()||'merged-document')+'.pdf';
+    pdf.save(fname);
+    document.getElementById('mergeResult').style.display='block';
+    document.getElementById('mergeResultTxt').textContent=`✓ ${toRender.length} pages → ${fname} downloaded! (${getElapsed()})`;
+    document.getElementById('mergeResult').scrollIntoView({behavior:'smooth'});
+    showToast('✓ PDF saved!','ok');
+  }catch(e){lbl.textContent='✗ '+e.message;fill.style.background='#ff6b6b';showToast('✗ '+e.message,'err');}
+  setLoading(btn,false,mMode==='merge'?'🔗 Merge & Download PDF':'✂️ Apply & Download PDF');
+}
+
+addSlot();addSlot();
+</script>
+</body></html>

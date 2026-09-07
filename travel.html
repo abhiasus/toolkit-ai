@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Travel Itinerary — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#4d96ff22">✈️</div>
+    <h1 class="tool-title" style="color:#4d96ff">Travel Itinerary</h1>
+    <p class="tool-desc">Plan your perfect trip. Day-by-day itineraries with activities, restaurants, and local tips.</p>
+  </div>
+  <div class="tool-card">
+  <div class="row row-2">
+    <div><div class="label">Destination</div><input type="text" id="tDest" placeholder="Tokyo, Paris, Goa, Bali..."></div>
+    <div><div class="label">Days</div><select id="tDays"><option>1 day</option><option>2 days</option><option selected>3 days</option><option>5 days</option><option>7 days</option><option>10 days</option><option>14 days</option></select></div>
+  </div>
+  <div class="row row-2" style="margin-top:0">
+    <div><div class="label">Style</div><select id="tStyle"><option selected>Balanced</option><option>Adventure</option><option>Relaxing</option><option>Cultural</option><option>Foodie</option><option>Budget</option><option>Luxury</option></select></div>
+    <div><div class="label">Budget</div><select id="tBudget"><option>Budget ($)</option><option selected>Mid-range ($$)</option><option>Luxury ($$$)</option></select></div>
+  </div>
+  <div class="label">Interests (optional)</div>
+  <input type="text" id="tInt" placeholder="museums, hiking, nightlife, street food, beaches...">
+  <div class="label">Traveling with</div>
+  <div class="chips" id="tWithC">
+    <button class="chip active" onclick="setTW(this,'Solo')">Solo</button><button class="chip" onclick="setTW(this,'Couple')">Couple</button><button class="chip" onclick="setTW(this,'Family')">Family</button><button class="chip" onclick="setTW(this,'Friends')">Friends</button>
+  </div>
+  <button class="btn btn-full btn-run-primary" id="runBtn" style="background:#4d96ff;color:#000;margin-top:14px" onclick="genTrip()">✈️ Generate Itinerary</button>
+  <div id="travelOut-wrap" style="display:none;margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span class="label" style="margin:0">Result</span>
+      <div style="display:flex;gap:6px">
+        <button class="copy-btn" onclick="copyText(document.getElementById('travelOut').innerText,this)">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput('travelOut','itinerary.txt')">⬇</button>
+      </div>
+    </div>
+    <div class="output-box" id="travelOut" style="min-height:160px"></div>
+  </div>
+</div>
+</main>
+<footer><p>ToolKit AI · <a href="index.html">← Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let tWith='Solo';
+function setTW(el,t){tWith=t;document.querySelectorAll('#tWithC .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+async function genTrip(){
+  const dest=document.getElementById('tDest').value.trim();
+  if(!dest){showToast('⚠ Enter a destination','warn');return;}
+  const btn=document.getElementById('runBtn');startTimer();showSkeleton(document.getElementById('travelOut'));setLoading(btn,true,'✈️ Generate Itinerary',true);
+  try{
+    const res=await callClaude('Professional travel planner. Detailed day-by-day itinerary: morning/afternoon/evening activities, specific place names, restaurant recommendations, costs, transport tips, 2-3 hidden gems.',
+      'Destination: '+dest+'\nDays: '+document.getElementById('tDays').value+'\nStyle: '+document.getElementById('tStyle').value+'\nBudget: '+document.getElementById('tBudget').value+'\nTraveling with: '+tWith+'\nInterests: '+(document.getElementById('tInt').value||'General sightseeing'));
+    showOutput(document.getElementById('travelOut'),res);document.getElementById('travelOut-wrap').style.display='block';
+    document.getElementById('travelOut-wrap').scrollIntoView({behavior:'smooth'});showToast('Ready in '+getElapsed(),'ok');}
+  catch(e){showOutput(document.getElementById('travelOut'),'Error: '+e.message,true);document.getElementById('travelOut-wrap').style.display='block';}
+  setLoading(btn,false,'✈️ Generate Itinerary');
+}
+</script>
+</body></html>

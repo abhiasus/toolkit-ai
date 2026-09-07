@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Essay Rewriter — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.mode-card{padding:14px 16px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;transition:all .18s;text-align:left}
+.mode-card:hover{border-color:#444}
+.mode-card.active{border-color:#ff9a3c;background:#1a0f00}
+.mode-card-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.mode-card-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.diff-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+@media(max-width:600px){.diff-row,.mode-grid{grid-template-columns:1fr}}
+.panel-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.char-count{font-size:11px;color:var(--muted);margin-top:4px;text-align:right}
+</style>
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page" style="max-width:980px">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ff9a3c22">✍️</div>
+    <h1 class="tool-title" style="color:#ff9a3c">Essay Rewriter</h1>
+    <p class="tool-desc">Improve, rewrite, simplify, or make academic. Four modes to transform any text while keeping your meaning.</p>
+  </div>
+
+  <div class="tool-card">
+    <div class="label">Select mode</div>
+    <div class="mode-grid">
+      <div class="mode-card active" id="mode-improve" onclick="setMode('improve',this)">
+        <div class="mode-card-title" style="color:#ff9a3c">✨ Improve & Polish</div>
+        <div class="mode-card-desc">Fix grammar, improve flow, enhance clarity while keeping your voice</div>
+      </div>
+      <div class="mode-card" id="mode-rewrite" onclick="setMode('rewrite',this)">
+        <div class="mode-card-title" style="color:#ff6b6b">🔄 Full Rewrite</div>
+        <div class="mode-card-desc">Complete rewrite in a more engaging, professional style</div>
+      </div>
+      <div class="mode-card" id="mode-simplify" onclick="setMode('simplify',this)">
+        <div class="mode-card-title" style="color:#4d96ff">🔍 Simplify</div>
+        <div class="mode-card-desc">Rewrite in plain, clear language anyone can understand</div>
+      </div>
+      <div class="mode-card" id="mode-academic" onclick="setMode('academic',this)">
+        <div class="mode-card-title" style="color:#c77dff">🎓 Academic</div>
+        <div class="mode-card-desc">Formal academic style with sophisticated vocabulary and structure</div>
+      </div>
+    </div>
+
+    <div class="label">Your text</div>
+    <textarea id="essayText" style="min-height:200px" placeholder="Paste your essay, paragraph, sentence, or any text to rewrite..." oninput="updateCount()"></textarea>
+    <div class="char-count" id="charCount">0 words</div>
+
+    <button class="btn btn-full" id="runBtn" style="background:#ff9a3c;color:#000;margin-top:16px" onclick="runRewrite()">
+      ✍️ Rewrite
+    </button>
+
+    <div class="diff-row">
+      <div>
+        <div class="panel-label">Original</div>
+        <div class="output-box" id="originalBox" style="min-height:200px;max-height:400px">
+          <span class="output-placeholder">Your original text will appear here after rewriting.</span>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="panel-label">Rewritten</div>
+          <button class="copy-btn" onclick="copyOutput()" style="float:none;margin-bottom:8px">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'essay-rewritten.txt\')">⬇</button>
+        </div>
+        <div class="output-box" id="output" style="min-height:200px;max-height:400px">
+          <span class="output-placeholder">The rewritten version will appear here.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+let mode = 'improve';
+function setMode(m, el) {
+  mode = m;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function updateCount() {
+  const words = document.getElementById('essayText').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('charCount').textContent = words.toLocaleString() + ' words';
+}
+
+async function runRewrite() {
+  const text = document.getElementById('essayText').value.trim();
+  if (!text) { showToast('⚠ Please paste some text first.','warn'); return; }
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '✍️ Rewrite');
+
+  const systems = {
+    improve: 'You are a professional editor. Improve this text: fix grammar, enhance clarity, improve flow and word choice. Keep the author\'s voice and all original meaning. Output only the improved text.',
+    rewrite: 'You are a professional writer. Completely rewrite this text in a more engaging, polished, professional style. Keep the meaning but make it much better. Output only the rewritten text.',
+    simplify: 'You are a plain-language expert. Rewrite this text so a 12-year-old can understand it easily. Use short sentences, simple words, no jargon. Keep all the meaning. Output only the simplified text.',
+    academic: 'You are an academic writing expert. Rewrite this text in formal academic style: sophisticated vocabulary, proper hedging language, passive voice where appropriate, structured argumentation. Output only the academic version.'
+  };
+
+  showOutput(document.getElementById('originalBox'), text);
+  try {
+    const result = await callClaude(systems[mode], text);
+    showOutput(document.getElementById('output'), result);
+  } catch (e) {
+    showOutput(document.getElementById('output'), 'Error: ' + e.message, true);
+  }
+  setLoading(btn, false, '✍️ Rewrite');
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
+    const b = document.querySelector('.copy-btn');
+    b.textContent = '✓ Copied!'; setTimeout(() => b.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>

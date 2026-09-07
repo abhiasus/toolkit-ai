@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Help — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hw{max-width:860px;margin:0 auto;padding:28px 20px 100px}
+.toc{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:24px}
+.toc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:5px}
+.tl{padding:5px 8px;border-radius:6px;font-size:11px;color:var(--muted);text-decoration:none;background:var(--bg3);display:block;transition:all .15s}
+.tl:hover{color:var(--text);background:var(--bg)}
+.hc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px}
+.hh{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.hi{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ht{font-size:14px;font-weight:700}
+.hs{font-size:11px;color:var(--muted);margin-top:1px}
+.tog{margin-left:auto;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--muted);padding:2px 10px;cursor:pointer;font-family:inherit;font-size:11px}
+.hb{margin-top:12px}
+.steps{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.step{display:flex;gap:10px;font-size:13px;color:#b8b8cc;line-height:1.6;align-items:flex-start}
+.sn{width:22px;height:22px;border-radius:50%;background:#4d96ff22;color:#4d96ff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.sg{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:22px 0 10px;display:flex;align-items:center;gap:12px}
+.sg::after{content:'';flex:1;height:1px;background:var(--border)}
+.bg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.bc{padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--bg)}
+.bc-t{font-weight:700;font-size:13px;margin-bottom:6px}
+.bc ul{padding-left:14px;font-size:11px;color:var(--muted);line-height:1.9}
+.bc li{list-style:disc}
+@media(max-width:600px){.bg{grid-template-columns:1fr}.toc-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+<main class="hw content">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:42px;margin-bottom:10px">📖</div>
+    <h1 style="font-family:var(--font-display);font-size:26px;font-weight:900;margin-bottom:6px">How to Use ToolKit AI</h1>
+    <p style="color:var(--muted);font-size:14px">Step-by-step guide for all 26 tools</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Jump to any tool</div>
+    <div class="toc-grid">
+      <a href="#setup" class="tl">⚡ Setup First</a>
+      <a href="#chat" class="tl">💬 AI Chat</a>
+      <a href="#translate" class="tl">🌐 Translate</a>
+      <a href="#grammar" class="tl">✅ Grammar</a>
+      <a href="#paraphrase" class="tl">🔁 Paraphrase</a>
+      <a href="#summarize" class="tl">📝 Summarize</a>
+      <a href="#tone" class="tl">🎭 Tone</a>
+      <a href="#email" class="tl">📧 Email</a>
+      <a href="#ideas" class="tl">💡 Ideas</a>
+      <a href="#pdf" class="tl">📄 Doc Summary</a>
+      <a href="#convert" class="tl">🔄 Convert</a>
+      <a href="#resume" class="tl">📋 Resume</a>
+      <a href="#cover" class="tl">✉️ Cover Letter</a>
+      <a href="#flash" class="tl">🃏 Flashcards</a>
+      <a href="#code" class="tl">💻 Code</a>
+      <a href="#essay" class="tl">✍️ Essay</a>
+      <a href="#quiz" class="tl">🧠 Quiz</a>
+      <a href="#image" class="tl">🎨 Image Gen</a>
+      <a href="#data" class="tl">📊 Data</a>
+      <a href="#meeting" class="tl">🗒 Meeting</a>
+      <a href="#social" class="tl">📱 Social</a>
+      <a href="#recipe" class="tl">🍳 Recipe</a>
+      <a href="#workout" class="tl">💪 Workout</a>
+      <a href="#travel" class="tl">✈️ Travel</a>
+      <a href="#study" class="tl">📚 Study</a>
+      <a href="#merge" class="tl">🔗 Merge</a>
+    </div>
+  </div>
+
+  <div class="sg" id="setup">⚡ Setup First</div>
+  <div class="hc">
+    <div class="hh"><div class="hi" style="background:#4d96ff22">⚙️</div><div><div class="ht" style="color:#4d96ff">Choose Your AI Backend</div><div class="hs">Required before using any AI tool</div></div></div>
+    <div class="hb">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Setup wizard appears on first open. Pick one:</p>
+      <div class="bg">
+        <div class="bc" style="border-color:#c77dff44"><div class="bc-t" style="color:#c77dff">⚡ Groq <span style="font-size:9px;background:#c77dff22;padding:2px 6px;border-radius:4px">RECOMMENDED</span></div><ul><li>Free API key</li><li>Ultra fast</li><li>console.groq.com</li><li>Key starts with gsk_</li></ul></div>
+        <div class="bc" style="border-color:#4d96ff44"><div class="bc-t" style="color:#4d96ff">🔵 Gemini</div><ul><li>Free from Google</li><li>Best for big PDFs</li><li>aistudio.google.com</li><li>Key starts with AIza</li></ul></div>
+        <div class="bc" style="border-color:#6bcb7744"><div class="bc-t" style="color:#6bcb77">🖥 Ollama</div><ul><li>100% offline</li><li>ollama.com</li><li>ollama serve</li><li>ollama pull mistral</li></ul></div>
+      </div>
+      <div class="tip-box">💡 Green dot bottom-right = connected. Click <b>⚙ Config</b> to switch anytime. <b>Ctrl+Enter</b> = run any tool. <b>Escape</b> = cancel.</div>
+    </div>
+  </div>
+
+  <div class="sg">💬 Chat & Writing</div>
+
+  <div class="hc" id="chat"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#4d96ff22">💬</div><div><div class="ht" style="color:#4d96ff">AI Chat</div><div class="hs">Streaming, history, system prompt</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Set system prompt (optional): "You are a Python expert" or leave blank.</div></div>
+    <div class="step"><div class="sn">2</div><div>Type message → Enter to send (Shift+Enter = new line).</div></div>
+    <div class="step"><div class="sn">3</div><div>AI replies word by word. Click ■ to stop. History auto-saved.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="translate"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#06d6a022">🌐</div><div><div class="ht" style="color:#06d6a0">Translator</div><div class="hs">30+ languages including all Indian langs</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick source (or Auto-detect) and target language.</div></div>
+    <div class="step"><div class="sn">2</div><div>Paste text → Translate. Click ⇄ to swap and translate back.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="grammar"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#6bcb7722">✅</div><div><div class="ht" style="color:#6bcb77">Grammar Checker</div><div class="hs">Diff view, score /100, issue list</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick style: Standard / Formal / Casual / Business.</div></div>
+    <div class="step"><div class="sn">2</div><div>Paste text → Check Grammar → see score, diff view (green=added, red=removed), issues list.</div></div>
+    <div class="step"><div class="sn">3</div><div>Click Copy Fixed to copy corrected version.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="paraphrase"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ffd93d22">🔁</div><div><div class="ht" style="color:#ffd93d">Paraphraser</div><div class="hs">6 modes, side-by-side view</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick: ✨ Fluency · 👔 Formal · 🎨 Creative · ⚡ Shorten · 📖 Expand · 🔍 Simplify</div></div>
+    <div class="step"><div class="sn">2</div><div>Paste text → Paraphrase. Original left, result right. Copy or download.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="summarize"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ff9a3c22">📝</div><div><div class="ht" style="color:#ff9a3c">Text Summarizer</div><div class="hs">Bullet, TLDR, Key Facts, Abstract</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick format + length (Short/Medium/Detailed).</div></div>
+    <div class="step"><div class="sn">2</div><div>Paste text → Summarize → Copy or Download.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="tone"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ff6b6b22">🎭</div><div><div class="ht" style="color:#ff6b6b">Tone Analyzer</div><div class="hs">Sentiment, formality, emotion bars</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Paste any text (email, tweet, article, speech).</div></div>
+    <div class="step"><div class="sn">2</div><div>See: sentiment (😊😠😐), formality level, tone % bars, emotion tags, analysis.</div></div>
+  </div><div class="ex-box" style="margin-top:8px"><b>Tip:</b> Paste your email before sending to check tone.</div></div></div>
+
+  <div class="hc" id="email"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#c77dff22">📧</div><div><div class="ht" style="color:#c77dff">Email Writer</div><div class="hs">8 types, 5 tones, 3 lengths</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick type: Follow-up / Request / Apology / Complaint / Intro / Thank You / Decline / Custom.</div></div>
+    <div class="step"><div class="sn">2</div><div>Fill recipient, your name, context (be specific). Pick tone + length → Write Email.</div></div>
+    <div class="step"><div class="sn">3</div><div>Output includes Subject line + full body. Copy or download.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="ideas"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#00c9a722">💡</div><div><div class="ht" style="color:#00c9a7">Idea Generator</div><div class="hs">8 categories, up to 20 ideas</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick category: General / Business / Content / App / Names / Projects / Marketing / Essay.</div></div>
+    <div class="step"><div class="sn">2</div><div>Enter topic + optional context → pick count (5/10/15/20) → Generate.</div></div>
+  </div></div></div>
+
+  <div class="sg">📄 Document Tools</div>
+
+  <div class="hc" id="pdf"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ff6b6b22">📄</div><div><div class="ht" style="color:#ff6b6b">Doc Summarizer</div><div class="hs">PDF, Word, Image, or pasted text</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick tab: PDF / Word / Image / Paste Text. Upload file or paste text.</div></div>
+    <div class="step"><div class="sn">2</div><div>Pick style: Detailed / Bullet Points / Short / Academic → Summarize.</div></div>
+  </div><div class="tip-box" style="margin-top:8px">💡 Use Gemini for large PDFs — it auto-detects the best model from your key.</div></div></div>
+
+  <div class="hc" id="convert"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#06d6a022">🔄</div><div><div class="ht" style="color:#06d6a0">File Converter</div><div class="hs">PDF↔Word↔Image↔Text</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick input: 📄 PDF · 📝 Word · 🖼 Image · 📃 Text. Upload file — confirms with ✅.</div></div>
+    <div class="step"><div class="sn">2</div><div>Pick output format (auto-updates based on input type).</div></div>
+    <div class="step"><div class="sn">3</div><div>Click Convert → downloads instantly.</div></div>
+  </div><div class="ex-box" style="margin-top:8px"><b>Examples:</b> PDF→Word · PDF→Markdown · Word→PDF · 3 images→PDF · Text→PDF</div></div></div>
+
+  <div class="hc" id="merge"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#4d96ff22">🔗</div><div><div class="ht" style="color:#4d96ff">Doc Merger & Page Editor</div><div class="hs">Merge PDFs or remove/replace pages</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px"><b>Mode 1 — Merge:</b></p>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><div>Add 2+ PDFs. Set page range: "1-4", "2,5,8", blank=all.</div></div>
+      <div class="step"><div class="sn">2</div><div>Use ▲▼ to reorder → Merge → combined PDF downloads.</div></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 8px"><b>Mode 2 — Remove/Replace:</b></p>
+    <div class="steps">
+      <div class="step"><div class="sn">1</div><div>Upload PDF → thumbnails of every page appear.</div></div>
+      <div class="step"><div class="sn">2</div><div>Click pages to exclude (turns red = removed).</div></div>
+      <div class="step"><div class="sn">3</div><div>Optional: upload replacement PDF to insert at any position.</div></div>
+      <div class="step"><div class="sn">4</div><div>Apply → clean PDF downloads.</div></div>
+    </div>
+    <div class="ex-box" style="margin-top:8px"><b>Example:</b> Doc has pages 1-4 (keep), 5-8 (remove), 9-43 (keep). Upload → click 5,6,7,8 red → Apply → done!</div>
+  </div></div>
+
+  <div class="hc" id="resume"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ffd93d22">📋</div><div><div class="ht" style="color:#ffd93d">Resume Analyzer</div><div class="hs">Score /100, ATS keywords, quick wins</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Enter target job role + experience level.</div></div>
+    <div class="step"><div class="sn">2</div><div>Paste full resume text → Analyze → score, strengths, improvements, missing keywords.</div></div>
+  </div><div class="tip-box" style="margin-top:8px">💡 Change the role each time you apply — different job = different keywords.</div></div></div>
+
+  <div class="hc" id="cover"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#6bcb7722">✉️</div><div><div class="ht" style="color:#6bcb77">Cover Letter</div><div class="hs">Personalized, job-specific</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Fill name, job title, company.</div></div>
+    <div class="step"><div class="sn">2</div><div>Background — be specific: skills, projects, experience. Paste job description for better tailoring.</div></div>
+    <div class="step"><div class="sn">3</div><div>Pick tone → Generate → Download.</div></div>
+  </div></div></div>
+
+  <div class="sg">📚 Study & Code</div>
+
+  <div class="hc" id="flash"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#4d96ff22">🃏</div><div><div class="ht" style="color:#4d96ff">Flashcard Maker</div><div class="hs">3D flip cards from any study material</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick count (5/8/12/16). Paste notes or textbook content → Generate.</div></div>
+    <div class="step"><div class="sn">2</div><div>Click any card to flip it (3D animation) → see answer.</div></div>
+    <div class="step"><div class="sn">3</div><div>Track reviewed. Reset All or Export as .txt.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="code"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#c77dff22">💻</div><div><div class="ht" style="color:#c77dff">Code Explainer</div><div class="hs">Explain, debug, optimize, comment</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick: 💡 Explain · 🐛 Find Bugs · ⚡ Optimize · 📝 Add Comments.</div></div>
+    <div class="step"><div class="sn">2</div><div>Type language (optional) + pick level → Paste code → Run.</div></div>
+  </div><div class="tip-box" style="margin-top:8px">💡 Works with Python, JS, Java, C++, SQL, Rust, Go — any language.</div></div></div>
+
+  <div class="hc" id="essay"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ff9a3c22">✍️</div><div><div class="ht" style="color:#ff9a3c">Essay Rewriter</div><div class="hs">4 modes, side-by-side diff</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick: ✨ Improve · 🔄 Rewrite · 🔍 Simplify · 🎓 Academic.</div></div>
+    <div class="step"><div class="sn">2</div><div>Paste text → Rewrite. Original left, result right. Copy or download.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="quiz"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#00c9a722">🧠</div><div><div class="ht" style="color:#00c9a7">Quiz Generator</div><div class="hs">MCQ, live scoring, explanations</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Set count + difficulty. Enter topic or paste notes.</div></div>
+    <div class="step"><div class="sn">2</div><div>Quiz starts automatically. Green=correct, Red=wrong + explanation.</div></div>
+    <div class="step"><div class="sn">3</div><div>Final score with emoji rating. Download results.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="study"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#c77dff22">📚</div><div><div class="ht" style="color:#c77dff">Study Planner</div><div class="hs">Day-by-day exam prep schedules</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Enter subject: "BCA Sem 5", "AWS Cloud", "IELTS".</div></div>
+    <div class="step"><div class="sn">2</div><div>Set days, hours/day, level. List topics optionally.</div></div>
+    <div class="step"><div class="sn">3</div><div>Generate → day-by-day plan with Pomodoro, spaced repetition, practice test days.</div></div>
+  </div></div></div>
+
+  <div class="sg">🆕 New Tools</div>
+
+  <div class="hc" id="image"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ff6b6b22">🎨</div><div><div class="ht" style="color:#ff6b6b">Image Generator</div><div class="hs">Free — no API key needed at all</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Write detailed prompt. Pick style + size + count.</div></div>
+    <div class="step"><div class="sn">2</div><div>Generate → images load in ~10-15s. Click ⬇ Download each.</div></div>
+  </div><div class="ex-box" style="margin-top:8px"><b>Good prompt:</b> "Futuristic Bangalore at night with neon lights, flying autos, digital art, vivid colors, 8k"</div><div class="tip-box" style="margin-top:8px">💡 Works without any AI backend — 100% free via Pollinations AI.</div></div></div>
+
+  <div class="hc" id="data"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#4d96ff22">📊</div><div><div class="ht" style="color:#4d96ff">Data Analyzer</div><div class="hs">CSV upload + AI insights</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Upload CSV or paste comma-separated data.</div></div>
+    <div class="step"><div class="sn">2</div><div>Preview auto-shows (first 20 rows). Pick analysis type.</div></div>
+    <div class="step"><div class="sn">3</div><div>Analyze → copy or download results.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="meeting"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#00c9a722">🗒</div><div><div class="ht" style="color:#00c9a7">Meeting Notes</div><div class="hs">Transcript → structured notes</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Enter title + pick meeting type. Paste transcript.</div></div>
+    <div class="step"><div class="sn">2</div><div>Pick format: Structured / Bullets / Formal Minutes / Actions Only → Generate.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="social"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#1da1f222">📱</div><div><div class="ht" style="color:#1da1f2">Social Writer</div><div class="hs">Twitter, LinkedIn, Instagram, Facebook, Threads, TikTok</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick platform — rules built in (char limits, hashtags, style).</div></div>
+    <div class="step"><div class="sn">2</div><div>Enter topic + tone + optional context.</div></div>
+    <div class="step"><div class="sn">3</div><div>Pick variations (1/3/5) → Generate. Each post shows char count. Copy individually.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="recipe"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#ff9a3c22">🍳</div><div><div class="ht" style="color:#ff9a3c">Recipe Generator</div><div class="hs">Full recipes from your ingredients</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>"I have chicken, rice, garlic" or "I want biryani".</div></div>
+    <div class="step"><div class="sn">2</div><div>Pick dietary, meal type, cuisine, servings → Generate.</div></div>
+    <div class="step"><div class="sn">3</div><div>Full recipe: steps, tips, calorie estimate. Copy or download.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="workout"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#6bcb7722">💪</div><div><div class="ht" style="color:#6bcb77">Workout Planner</div><div class="hs">Sets, reps, rest times, weekly schedule</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Pick goal: Muscle / Fat Loss / Endurance / Strength / Flexibility.</div></div>
+    <div class="step"><div class="sn">2</div><div>Set level, days/week, duration, equipment.</div></div>
+    <div class="step"><div class="sn">3</div><div>Add notes (focus areas, injuries) → Generate full weekly plan.</div></div>
+  </div></div></div>
+
+  <div class="hc" id="travel"><div class="hh" onclick="tog(this)"><div class="hi" style="background:#4d96ff22">✈️</div><div><div class="ht" style="color:#4d96ff">Travel Itinerary</div><div class="hs">Day-by-day with restaurants and tips</div></div><button class="tog">▼</button></div>
+  <div class="hb" style="display:none"><div class="steps">
+    <div class="step"><div class="sn">1</div><div>Enter destination + days. Pick style, budget, interests, who you're with.</div></div>
+    <div class="step"><div class="sn">2</div><div>Generate → morning/afternoon/evening with specific places, restaurants, costs.</div></div>
+  </div><div class="ex-box" style="margin-top:8px"><b>Example:</b> Goa · 3 days · Foodie · Friends → specific restaurants, beaches, nightlife</div></div></div>
+
+  <div style="text-align:center;margin-top:32px">
+    <a href="index.html" class="btn" style="background:#4d96ff;color:#000;font-weight:700">← Back to All 26 Tools</a>
+  </div>
+</main>
+<footer class="content"><p>ToolKit AI · <a href="index.html">Home</a> · <a href="privacy.html">Privacy</a></p></footer>
+<script src="shared.js"></script>
+<script>
+function tog(hdr){
+  const body=hdr.nextElementSibling;
+  const btn=hdr.querySelector('.tog');
+  const show=body.style.display==='none'||!body.style.display;
+  body.style.display=show?'block':'none';
+  btn.textContent=show?'▲':'▼';
+}
+</script>
+</body>
+</html>

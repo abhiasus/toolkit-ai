@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resume Analyzer — ToolKit AI</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.score-badge{display:inline-flex;align-items:baseline;gap:4px;font-family:'Syne',sans-serif;font-size:48px;font-weight:900;line-height:1}
+.score-badge span{font-size:18px;color:var(--muted)}
+.score-row{display:flex;align-items:center;gap:20px;padding:20px;background:var(--bg);border:1px solid var(--border);border-radius:12px;margin-bottom:16px}
+.score-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+</style>
+
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ToolKit AI</a>
+  <div class="nav-links">
+    <a href="chat.html">💬 <span>Chat</span></a><a href="translate.html">🌐 <span>Translate</span></a><a href="grammar.html">✅ <span>Grammar</span></a><a href="paraphrase.html">🔁 <span>Paraphrase</span></a><a href="summarize.html">📝 <span>Summarize</span></a><a href="tone.html">🎭 <span>Tone</span></a><a href="email.html">📧 <span>Email</span></a><a href="ideas.html">💡 <span>Ideas</span></a><a href="pdf.html">📄 <span>PDF</span></a><a href="convert.html">🔄 <span>Convert</span></a><a href="resume.html">📋 <span>Resume</span></a><a href="cover.html">✉️ <span>Cover</span></a><a href="flash.html">🃏 <span>Flash</span></a><a href="code.html">💻 <span>Code</span></a><a href="essay.html">✍️ <span>Essay</span></a><a href="quiz.html">🧠 <span>Quiz</span></a><a href="image-gen.html">🎨 <span>Image</span></a><a href="data-analyzer.html">📊 <span>Data</span></a><a href="meeting-notes.html">🗒 <span>Meeting</span></a><a href="social.html">📱 <span>Social</span></a><a href="recipe.html">🍳 <span>Recipe</span></a><a href="workout.html">💪 <span>Workout</span></a><a href="travel.html">✈️ <span>Travel</span></a><a href="study-planner.html">📚 <span>Study</span></a><a href="merge.html">🔗 <span>Merge</span></a><a href="help.html">❓ <span>Help</span></a>
+  </div>
+</nav>
+
+<main class="tool-page">
+  <div class="tool-header">
+    <div class="tool-icon-wrap" style="background:#ffd93d22">📋</div>
+    <h1 class="tool-title" style="color:#ffd93d">Resume Analyzer</h1>
+    <p class="tool-desc">Paste your resume and get an honest score, detailed feedback, ATS keyword tips, and specific improvements.</p>
+  </div>
+
+  <div class="tool-card">
+    <div class="row row-2">
+      <div>
+        <div class="label">Target Job Role</div>
+        <input type="text" id="role" placeholder="e.g. Software Engineer, Data Analyst...">
+      </div>
+      <div>
+        <div class="label">Experience Level</div>
+        <select id="level">
+          <option value="student">Student / Fresh Graduate</option>
+          <option value="junior">Junior (1–3 years)</option>
+          <option value="mid">Mid-level (3–6 years)</option>
+          <option value="senior">Senior (6+ years)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="label">Paste your resume</div>
+    <textarea id="resumeText" style="min-height:220px" placeholder="Paste your full resume here — work experience, education, skills, projects..."></textarea>
+
+    <button class="btn btn-full" id="runBtn" style="background:#ffd93d;color:#000;margin-top:16px" onclick="runAnalysis()">
+      🔍 Analyze Resume
+    </button>
+
+    <div style="margin-top:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="label" style="margin:0">Analysis</span>
+        <button class="copy-btn" onclick="copyOutput()" style="float:none">Copy</button>
+        <button class="dl-btn" onclick="downloadOutput(\'output\',\'resume-analysis.txt\')">⬇</button>
+      </div>
+      <div class="output-box" id="output" style="max-height:600px">
+        <span class="output-placeholder">Your resume analysis, score, and detailed feedback will appear here.</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><p>ToolKit AI · <a href="index.html">← Back to Home</a></p></footer>
+<script src="shared.js"></script>
+<script>
+async function runAnalysis() {
+  const resume = document.getElementById('resumeText').value.trim();
+  if (!resume) { showToast('⚠ Please paste your resume first.','warn'); return; }
+  const role = document.getElementById('role').value.trim() || 'General';
+  const level = document.getElementById('level').value;
+  const btn = document.getElementById('runBtn');
+  startTimer();
+  showSkeleton(document.getElementById('output'));
+  setLoading(btn, true, '🔍 Analyze Resume');
+
+  const system = `You are a senior HR director and career coach with 15+ years experience. Analyze the resume and provide:
+
+1. **Overall Score: XX/100** (be honest and realistic)
+2. **Score Breakdown** — rate each: Contact Info, Work Experience, Skills, Education, Formatting, ATS Compatibility (each /10)
+3. **Top 3 Strengths** — specific things done well
+4. **Top 5 Improvements** — specific, actionable changes
+5. **ATS Keywords Missing** — keywords for the target role that aren't in the resume
+6. **Quick Wins** — 3 changes that would immediately boost the score
+7. **Final Verdict** — honest 2-sentence summary
+
+Be direct, specific, and actionable. Reference actual content from the resume.`;
+
+  try {
+    const result = await callClaude(system, `Target role: ${role}\nExperience level: ${level}\n\nResume:\n${resume}`);
+    showOutput(document.getElementById('output'), result);
+  } catch (e) {
+    showOutput(document.getElementById('output'), 'Error: ' + e.message, true);
+  }
+  setLoading(btn, false, '🔍 Analyze Resume');
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').innerText).then(() => {
+    const btns = document.querySelectorAll('.copy-btn');
+    btns.forEach(b => { b.textContent = '✓ Copied!'; setTimeout(() => b.textContent = 'Copy', 2000); });
+  });
+}
+</script>
+</body>
+</html>
