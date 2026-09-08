@@ -212,10 +212,10 @@ ${p.text}`).join('\n\n');}
 function buildMD(pg){return pg.map(p=>`## Page ${p.num}
 
 ${p.text}`).join('\n\n---\n\n');}
-function buildHTML(pg){return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Converted</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.7}h2{border-bottom:1px solid #ddd;padding-bottom:6px}</style></head><body>
-${pg.map(p=>`<h2>Page ${p.num}</h2><p>${p.text.replace(/
-/g,'<br>')}</p>`).join('\n')}\n</body></html>`;}\nfunction buildCSV(pg){return'Page,Content\n'+pg.map(p=>`${p.num},"${p.text.replace(/"/g,'""')}"`).join('
-');}
+function buildHTML(pg){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Converted</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.7}h2{border-bottom:1px solid #ddd;padding-bottom:6px}</style></head><body>
+${pg.map(p=>`<h2>Page ${p.num}</h2><p>${p.text.replace(/\n/g,'<br>')}</p>`).join('\n')}
+</body></html>`;}
+function buildCSV(pg){return 'Page,Content\n'+pg.map(p=>`${p.num},"${p.text.replace(/"/g,'""')}"`).join('\n');}
 function buildJSON(pg){return JSON.stringify(pg.map(p=>{return{page:p.num,content:p.text}}).filter(Boolean),null,2);}
 
 async function textToPDF(text){
