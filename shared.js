@@ -9,7 +9,7 @@ window.OLLAMA_MODEL = localStorage.getItem('ollama_model') || 'mistral';
 window.GEMINI_KEY   = localStorage.getItem('gemini_key')   || '';
 window.GEMINI_MODEL = localStorage.getItem('gemini_model') || '';
 window.GROQ_KEY     = localStorage.getItem('groq_key')     || '';
-window.GROQ_MODEL   = localStorage.getItem('groq_model')   || 'llama3-70b-8192';
+window.GROQ_MODEL   = localStorage.getItem('groq_model')   || 'llama-3.3-70b-versatile';
 
 // Active AbortController for cancel support
 window._currentAbort = null;
@@ -178,7 +178,7 @@ function showSetupWizard() {
           <div id="groqKeySection" style="display:none;margin-top:12px">
             <input type="password" id="wizGroqKey" placeholder="gsk_..." style="width:100%;background:#07070f;border:1px solid #252538;border-radius:8px;color:#e8e8f0;font-size:13px;padding:10px 14px;outline:none;font-family:monospace;box-sizing:border-box">
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-              ${['llama3-70b-8192','llama3-8b-8192','mixtral-8x7b-32768'].map(m=>`<button onclick="document.getElementById('wizGroqKey').dataset.model='${m}';document.querySelectorAll('.groq-model-btn').forEach(b=>b.style.opacity='.5');this.style.opacity='1'" class="groq-model-btn" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace;opacity:${m==='llama3-70b-8192'?'1':'.5'}">${m}</button>`).join('')}
+              ${['llama-3.3-70b-versatile','llama-3.1-8b-instant','mixtral-8x7b-32768'].map(m=>`<button onclick="document.getElementById('wizGroqKey').dataset.model='${m}';document.querySelectorAll('.groq-model-btn').forEach(b=>b.style.opacity='.5');this.style.opacity='1'" class="groq-model-btn" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace;opacity:${m==='llama-3.3-70b-versatile'?'1':'.5'}">${m}</button>`).join('')}
             </div>
           </div>
         </div>
@@ -267,7 +267,7 @@ function wizSave() {
   if (b === 'groq') {
     const key = document.getElementById('wizGroqKey').value.trim();
     if (!key) { errEl.textContent = 'Please paste your Groq API key above.'; errEl.style.display='block'; return; }
-    const model = document.getElementById('wizGroqKey').dataset.model || 'llama3-70b-8192';
+    const model = document.getElementById('wizGroqKey').dataset.model || 'llama-3.3-70b-versatile';
     window.GROQ_KEY = key; window.GROQ_MODEL = model; window.AI_BACKEND = 'groq';
     localStorage.setItem('groq_key', key); localStorage.setItem('groq_model', model);
   } else if (b === 'gemini') {
@@ -383,22 +383,14 @@ async function autoDetectGeminiModel(key) {
     if (!res.ok) return '';
     const data = await res.json();
     const models = (data.models||[]).map(m=>m.name.replace('models/','')).filter(m=>m.includes('gemini')&&!m.includes('embedding')&&!m.includes('aqa'));
-    const pref = ['gemini-2.5-flash','gemini-2.5-pro','gemini-2.0-flash','gemini-2.0-pro','gemini-1.5-flash','gemini-1.5-pro'];
+    const pref = ['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite'];
     for (const p of pref) { const f=models.find(m=>m.startsWith(p)); if(f)return f; }
     return models[0]||'';
   } catch(e) { return ''; }
 }
-async function detectAndFillModel() {
-  const key = document.getElementById('geminiKey')?.value?.trim()||window.GEMINI_KEY;
-  if (!key) { showToast('⚠ Enter API key first','warn'); return; }
-  const st = document.getElementById('modelDetectStatus');
-  if (st) { st.style.display='block'; st.textContent='🔍 Detecting...'; st.style.color='#4d96ff'; }
-  const d = await autoDetectGeminiModel(key);
-  if (d) { const el=document.getElementById('geminiModel'); if(el)el.value=d; if(st){st.textContent='✓ '+d;st.style.color='#6bcb77';} showToast('✓ Model: '+d,'ok'); }
-  else { if(st){st.textContent='⚠ Check your API key';st.style.color='#ff9a3c';} showToast('⚠ Could not detect','warn'); }
-}
+
 async function callGemini(systemPrompt, userMsg, signal, jsonMode) {
-  if(!window.GEMINI_MODEL){window.GEMINI_MODEL=await autoDetectGeminiModel(window.GEMINI_KEY)||'gemini-2.0-flash';localStorage.setItem('gemini_model',window.GEMINI_MODEL);}
+  if(!window.GEMINI_MODEL){window.GEMINI_MODEL=await autoDetectGeminiModel(window.GEMINI_KEY)||'gemini-3.8-flash';localStorage.setItem('gemini_model',window.GEMINI_MODEL);}
   const key = window.GEMINI_KEY, model = window.GEMINI_MODEL;
   if (!key) { showSetupWizard(); throw new Error('No Gemini API key. Complete setup first.'); }
   const body = {
@@ -511,7 +503,7 @@ async function callGroqStream(systemPrompt, userMsg, onChunk, signal) {
 
 // ── Gemini streaming ───────────────────────────────────────────────────────
 async function callGeminiStream(systemPrompt, userMsg, onChunk, signal) {
-  if(!window.GEMINI_MODEL){window.GEMINI_MODEL=await autoDetectGeminiModel(window.GEMINI_KEY)||'gemini-2.0-flash';localStorage.setItem('gemini_model',window.GEMINI_MODEL);}
+  if(!window.GEMINI_MODEL){window.GEMINI_MODEL=await autoDetectGeminiModel(window.GEMINI_KEY)||'gemini-3.8-flash';localStorage.setItem('gemini_model',window.GEMINI_MODEL);}
   const key = window.GEMINI_KEY, model = window.GEMINI_MODEL;
   if (!key) throw new Error('No Gemini API key');
   const body = {
@@ -759,7 +751,7 @@ function initAIBar() {
         <input type="password" id="geminiKey" placeholder="AIza..." style="margin-bottom:10px">
         <div class="label">Model</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          ${['gemini-2.0-flash','gemini-2.5-flash','gemini-1.5-pro'].map(m=>`<button onclick="document.getElementById('geminiModel').value='${m}'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#4d96ff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">${m}</button>`).join('')}
+          ${['gemini-3.8-flash','gemini-3-flash-preview','gemini-3.5-flash-lite'].map(m=>`<button onclick="document.getElementById('geminiModel').value='${m}'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#4d96ff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">${m}</button>`).join('')}
         </div>
         <input type="text" id="geminiModel" placeholder="auto-detect on save" style="margin-bottom:10px">
       </div>
@@ -769,9 +761,13 @@ function initAIBar() {
         <input type="password" id="groqKey" placeholder="gsk_..." style="margin-bottom:10px">
         <div class="label">Model</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          ${['llama3-70b-8192','llama3-8b-8192','mixtral-8x7b-32768','gemma2-9b-it'].map(m=>`<button onclick="document.getElementById('groqModel').value='${m}'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">${m}</button>`).join('')}
+          <button onclick="document.getElementById('groqModel').value='llama-3.3-70b-versatile'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">llama-3.3-70b-versatile</button>
+          <button onclick="document.getElementById('groqModel').value='llama-3.1-8b-instant'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">llama-3.1-8b-instant</button>
+          <button onclick="document.getElementById('groqModel').value='llama-3.3-70b-versatile'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">llama-3.3-70b-versatile</button>
         </div>
-        <input type="text" id="groqModel" placeholder="llama3-70b-8192" style="margin-bottom:10px">
+        <input type="text" id="groqModel" placeholder="Select model" style="margin-bottom:10px">
+        <div id="groqModelList" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;min-height:20px"></div>
+        <div id="groqModelPending" style="display:none;color:#ffd93d;font-size:12px;margin-bottom:8px"><span id="groqModelFetchStatus">🔄 Fetching Groq models…</span></div>
       </div>
       <div style="display:flex;gap:10px;margin-top:4px">
         <button onclick="saveAIConfig()" style="flex:1;background:#4d96ff;color:#000;border:none;border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit">Save & Close</button>
@@ -811,12 +807,16 @@ function selectBackend(b, init=false) {
   }else if(b==='gemini'){
     const k=document.getElementById('geminiKey');const m=document.getElementById('geminiModel');
     if(k)k.value=vals.gemini.key;if(m)m.value=vals.gemini.model;
+  }else if(b==='gemini'){
+    const k=document.getElementById('geminiKey');const m=document.getElementById('geminiModel');
+    if(k)k.value=vals.gemini.key;if(m)m.value=vals.gemini.model;
+    populateGeminiModels();
   }else if(b==='groq'){
     const k=document.getElementById('groqKey');const m=document.getElementById('groqModel');
     if(k)k.value=vals.groq.key;if(m)m.value=vals.groq.model;
+    populateGroqModels();
   }
 }
-
 async function loadOllamaModels() {
   const el=document.getElementById('ollamaModelList');
   if(!el)return;
@@ -831,44 +831,176 @@ async function loadOllamaModels() {
   }catch{el.innerHTML='<span style="color:#ff9090;font-size:12px">Cannot reach Ollama</span>';}
 }
 
+async function fetchSupportedGroqModels() {
+  const el = document.getElementById('groqModelList');
+  const status = document.getElementById('groqModelPending');
+  if (!el || !status) return [];
+  el.innerHTML = '<span style="color:#555;font-size:12px">🔄 Fetching…</span>';
+  status.style.display = 'block';
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: {'Authorization': `Bearer ${window.GROQ_KEY}`},
+      signal: AbortSignal.timeout(6000)
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const models = (data.data || []).map(m => m.id).filter(id =>
+      id && !id.includes('embed') && !id.includes('whisper') && !id.includes('voxtral')
+    );
+    if (models.length) {
+      el.innerHTML = models.map(m =>
+        `<button onclick="document.getElementById('groqModel').value='${m}'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">${m}</button>`
+      ).join('');
+      return models;
+    }
+    // Fallback: display a warning list of known supported models
+    el.innerHTML = '<span style="color:#ffd93d;font-size:12px">⚠ No models returned; showing known supported list</span>';
+    const known = ['llama-3.3-70b-versatile','llama-3.1-8b-instant','llama-3.2-3b-preview','llama-3.2-1b-preview','llama-3.2-1b-instruct','llama-3.2-3b-instruct','llama-3.1-70b-versatile','llama-3.1-405b-instruct','mixtral-8x7b-32768','gemma2-9b-it','deepseek-r1-distill-llama-70b','llama-3.2-90b-vision-preview'];
+    el.innerHTML = known.map(m =>
+      `<button onclick="document.getElementById('groqModel').value='${m}'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">${m}</button>`
+    ).join('');
+    return known;
+  } catch(e) {
+    status.style.display = 'block';
+    status.textContent = '✗ Fetch failed — showing known list';
+    const known = ['llama-3.3-70b-versatile','llama-3.1-8b-instant','llama-3.2-3b-preview','llama-3.2-1b-preview','llama-3.2-1b-instruct','llama-3.2-3b-instruct','llama-3.1-70b-versatile','llama-3.1-405b-instruct','mixtral-8x7b-32768','gemma2-9b-it','deepseek-r1-distill-llama-70b','llama-3.2-90b-vision-preview'];
+    el.innerHTML = known.map(m =>
+      `<button onclick="document.getElementById('groqModel').value='${m}'" style="background:#1a1a2e;border:1px solid #252538;border-radius:6px;color:#c77dff;padding:4px 10px;cursor:pointer;font-size:11px;font-family:monospace">${m}</button>`
+    ).join('');
+    return known;
+  }
+}
+
+function populateGeminiModels() {
+  const m = document.getElementById('geminiModel');
+  if (!m) return;
+  if (!m.value || m.value === 'Select model') {
+    const list = document.getElementById('geminiModelList');
+    if (list && list.children.length) {
+      m.value = list.children[0].textContent.trim();
+    } else {
+      m.value = 'gemini-3.8-flash';
+    }
+  }
+}
+
+function populateGroqModels() {
+  const m = document.getElementById('groqModel');
+  if (!m) return;
+  if (!m.value || m.value === 'Select model') {
+    const list = document.getElementById('groqModelList');
+    if (list && list.children.length) {
+      m.value = list.children[0].textContent.trim();
+    } else {
+      m.value = 'llama-3.3-70b-versatile';
+    }
+  }
+}
+
 function showAIModal() {
-  const m=document.getElementById('aiModal');
-  if(m){m.style.display='flex';selectBackend(window.AI_BACKEND,true);if(window.AI_BACKEND==='ollama')loadOllamaModels();}
+  const m = document.getElementById('aiModal');
+  if (m) { m.style.display = 'flex'; selectBackend(window.AI_BACKEND, true); if (window.AI_BACKEND === 'ollama') loadOllamaModels(); }
+
+
 }
 
 async function testAI() {
   const res=document.getElementById('aiTestResult');
   res.textContent='⏳ Testing...';res.style.color='#888';
   startTimer();
+  const b = window.AI_BACKEND;
+  if (!b || b === 'none') {
+    res.textContent='✗ No AI backend selected. Open config first.';res.style.color='#ff9090';
+    showToast('⚠ Select a backend first','warn');
+    return;
+  }
+  // Validate the key for the selected backend
+  const keyEl = document.getElementById(b === 'gemini' ? 'geminiKey' : b === 'groq' ? 'groqKey' : 'ollamaUrl');
+  let key = '';
+  if (b === 'gemini') key = (document.getElementById('geminiKey')?.value||'').trim();
+  else if (b === 'groq') key = (document.getElementById('groqKey')?.value||'').trim();
+  else key = (document.getElementById('ollamaUrl')?.value||'').trim();
+  if (!key) {
+    res.textContent='✗ Missing API key / URL. Enter it in the config.';res.style.color='#ff9090';
+    showToast('⚠ Enter your API key first','warn');
+    return;
+  }
   try{
-    const reply=await callClaude('','Reply with exactly: READY');
+    const reply = b === 'ollama'
+      ? await callOllama('','PING', {timeout: 6000})
+      : b === 'gemini'
+      ? await callGemini('','PING', null, false)
+      : await callGroq('','PING', null, false);
     res.textContent=`✓ Working! (${getElapsed()}) Response: "${reply.trim().slice(0,60)}"`;
     res.style.color='#6bcb77';
-  }catch(e){res.textContent=`✗ ${e.message}`;res.style.color='#ff6b6b';}
+  }catch(e){
+    res.textContent=`✗ ${e.message}`;
+    res.style.color='#ff6b6b';
+  }
+}
+
+function validateBackendKey(backend, key, model) {
+  // Shared validation: verifies key is non-empty AND model is a non-empty usable string.
+  // For Ollama this also verifies the server is reachable.
+  // Returns { ok: boolean, error: string }
+  if (!backend || backend === 'none') return { ok: false, error: 'No AI backend selected.' };
+  if (!key || !key.trim()) return { ok: false, error: 'API key / URL is empty.' };
+  if (!model || !model.trim()) return { ok: false, error: 'Model is empty.' };
+  // Ollama needs a reachable server
+  if (backend === 'ollama') {
+    return { ok: false, error: 'Ollama URL is unreachable — open config and click Test first.' };
+  }
+  return { ok: true, error: '' };
 }
 
 function saveAIConfig() {
   const b=window.AI_BACKEND;
-  if(b==='ollama'){
-    window.OLLAMA_URL=document.getElementById('ollamaUrl').value.trim()||'http://localhost:11434';
-    window.OLLAMA_MODEL=document.getElementById('ollamaModel').value.trim()||'mistral';
-    localStorage.setItem('ollama_url',window.OLLAMA_URL);
-    localStorage.setItem('ollama_model',window.OLLAMA_MODEL);
-  }else if(b==='gemini'){
-    window.GEMINI_KEY=document.getElementById('geminiKey').value.trim();
-    window.GEMINI_MODEL=document.getElementById('geminiModel').value.trim();
-    localStorage.setItem('gemini_key',window.GEMINI_KEY);
-    localStorage.setItem('gemini_model',window.GEMINI_MODEL);
+  if(!b||b==='none'){ showToast('⚠ Select a backend first','warn'); return; }
+  // ── Trim + validate FIRST ──
+  let key = '', model = '';
+  if(b==='gemini'){
+    key = (document.getElementById('geminiKey')?.value||'').trim();
+    model = (document.getElementById('geminiModel')?.value||'').trim() || 'gemini-3.8-flash';
+    if(!key){ showToast('⚠ Gemini API key is empty — paste it in the config','warn'); return; }
   }else if(b==='groq'){
-    window.GROQ_KEY=document.getElementById('groqKey').value.trim();
-    window.GROQ_MODEL=document.getElementById('groqModel').value.trim()||'llama3-70b-8192';
-    localStorage.setItem('groq_key',window.GROQ_KEY);
-    localStorage.setItem('groq_model',window.GROQ_MODEL);
+    key = (document.getElementById('groqKey')?.value||'').trim();
+    model = (document.getElementById('groqModel')?.value||'').trim() || 'llama-3.3-70b-versatile';
+    if(!key){ showToast('⚠ Groq API key is empty — paste it in the config','warn'); return; }
+  }else if(b==='ollama'){
+    key = (document.getElementById('ollamaUrl')?.value||'').trim();
+    model = (document.getElementById('ollamaModel')?.value||'').trim() || 'mistral';
+    if(!key){ showToast('⚠ Ollama URL is empty — enter it in the config','warn'); return; }
+  }
+  // ── Validate key+model combo works BEFORE saving ──
+  const v = validateBackendKey(b, key, model);
+  if (!v.ok) { showToast('⚠ '+v.error,'warn'); return; }
+  // ── Save to state + localStorage ──
+  if(b==='ollama'){
+    window.OLLAMA_URL=key;
+    window.OLLAMA_MODEL=model;
+    localStorage.setItem('ollama_url',key);
+    localStorage.setItem('ollama_model',model);
+  }else if(b==='gemini'){
+    window.GEMINI_KEY=key;
+    window.GEMINI_MODEL=model;
+    localStorage.setItem('gemini_key',key);
+    localStorage.setItem('gemini_model',model);
+  }else if(b==='groq'){
+    window.GROQ_KEY=key;
+    window.GROQ_MODEL=model;
+    localStorage.setItem('groq_key',key);
+    localStorage.setItem('groq_model',model);
+    // Fetch live model list after saving so it's ready next open
+    populateGroqModels();
+    fetchSupportedGroqModels().then(list=>{
+      const listEl=document.getElementById('groqModelList');
+      if(listEl) listEl.innerHTML='<span style="color:#555;font-size:12px">✓ '+ (list.length? list.length : 'known') +' Groq models loaded</span>';
+    }).catch(()=>{});
   }
   localStorage.setItem('ai_backend',b);
   document.getElementById('aiModal').style.display='none';
   checkAIStatus();
-  showToast('✓ Config saved!','ok');
+  showToast('✓ Config saved and verified!','ok');
 }
 
 async function checkAIStatus() {
